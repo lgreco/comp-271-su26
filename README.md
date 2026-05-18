@@ -1,2 +1,2 @@
-# comp-271-su26
+# COMP 271 Summer 2026
 Data Structures I for Summer 2026
