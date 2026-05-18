@@ -1,4 +1,4 @@
 def demo():
-    primt("Hello World")
+    print("Hello World")
 
 demo()
