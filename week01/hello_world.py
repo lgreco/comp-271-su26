@@ -1,1 +1,4 @@
-print("Hello World")
+def demo():
+    primt("Hello World")
+
+demo()
