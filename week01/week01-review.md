@@ -100,7 +100,7 @@ Read the notebook and pay attention to the commentary between versions. The key 
 
 ### Mississippi
 
-The [`mississippi.md`](./mississippi.md) and [`mississippi.py`](mississippi.py) files cover this problem in detail. The short version:
+The `mississippi.md` and `mississippi.py` files cover this problem in detail. The short version:
 
 **COMP 170 endpoint:** One function per letter, each consisting entirely of `print()` calls. Then grouping functions (`ss()`, `pp()`, `ssi()`) that call the letter functions in sequence. The top-level call reads almost like a pronunciation guide:
 
