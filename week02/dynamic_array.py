@@ -39,7 +39,7 @@ class DynamicArray:
                 output = output + str(self.zip_codes[i])
                 # Add a comma after every element except the last.
                 # The last index is self.size - 1, so we stop one short.
-                if i < self.size - 1:
+                if i < len(self.zip_codes) - 1:
                     output = output + ", "
             output = output + "]"
         return output
