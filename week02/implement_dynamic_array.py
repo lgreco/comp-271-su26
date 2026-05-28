@@ -12,9 +12,9 @@
 #   it is yourself, and check before every add — right here,
 #   every single time.
 
-import dynamic_array
+from dynamic_array import DynamicArray
 
 # Build one object from the dynamic_array blueprint.
 # From this point on, test_object is our "box" —
 # it carries its own list and its own size counter inside.
-test_object = dynamic_array.dynamic_array()
+test_object = DynamicArray()

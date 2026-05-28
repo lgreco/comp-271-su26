@@ -11,7 +11,7 @@
 #   just plain Python, no blueprints, no objects?
 #   What would you need to keep track of, and how would you do it?
 
-class dynamic_array:
+class DynamicArray:
 
     # __init__ is the constructor — Python calls it automatically
     # the moment you create a new object from this class.
@@ -31,9 +31,17 @@ class dynamic_array:
     # It builds one string showing all four slots,
     # including the empty ones (shown as -1).
     def __str__(self):
-        output = ""
-        for i in range(len(self.zip_codes)):
-            output = output + str(self.zip_codes[i]) + " "
+        if self.size == 0:
+            output = "nothing to show"
+        else:
+            output = "["
+            for i in range(self.size):
+                output = output + str(self.zip_codes[i])
+                # Add a comma after every element except the last.
+                # The last index is self.size - 1, so we stop one short.
+                if i < self.size - 1:
+                    output = output + ", "
+            output = output + "]"
         return output
 
     # add() puts a new zip code into the next open slot.
