@@ -13,15 +13,18 @@
 
 class DynamicArray:
 
+    RESIZE_BY = 2
+
     # __init__ is the constructor — Python calls it automatically
     # the moment you create a new object from this class.
     # Think of it as "set up a fresh, empty box."
-    def __init__(self):
+    def __init__(self, capacity):
         # We deliberately avoid the one-liner self.zip_codes = [-1] * 4
         # to show each step clearly: create an empty list, then
         # add four placeholder values (-1 means "slot not yet used").
         self.zip_codes = list()
-        for i in range(4):
+        self.capacity = capacity
+        for i in range(self.capacity):
             self.zip_codes.append(-1)
         # size tracks how many real zip codes we've added so far.
         # It starts at 0 because the box is empty.
@@ -44,13 +47,25 @@ class DynamicArray:
             output = output + "]"
         return output
 
+    def resize(self):
+        temp = list()
+        temp_capacity = RESIZE_BY * self.capacity
+        # Initializa the temp array
+        for i in range(temp_capacity):
+            temp.append(-1)
+        # copy existing array to temp
+        for i in range(self.capacity):
+            temp[i] = self.zip_codes[i]
+        # Replace object values
+        self.zip_codes = temp
+        self.capacity = temp_capacity
+
     # add() puts a new zip code into the next open slot.
     # self.size doubles as the index of that open slot —
     # because we always fill slots in order: 0, then 1, then 2, then 3.
     # If the box is already full (size has reached 4), we say so and stop.
     def add(self, zip_code):
-        if self.size < 4:
-            self.zip_codes[self.size] = zip_code
-            self.size = self.size + 1
-        else:
-            print("Sorry, no room")
+        if self.size >= self.capacity:
+            self.resize()
+        self.zip_codes[self.size] = zip_code
+        self.size = self.size + 1

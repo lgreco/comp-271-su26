@@ -20,10 +20,27 @@
 # In dynamic_array.py they lived inside __init__ as self.zip_codes and
 # self.size. Here they live at module scope because there is no object to
 # attach them to.
+
+capacity = 4
+resize_by = 2
+
 zip_codes = list()
-for i in range(4):
+for i in range(capacity):
     zip_codes.append(-1)
 size = 0
+
+def resize():
+    temp = list()
+    current_array_length = len(zip_codes)
+    new_capacity = resize_by * capacity
+    for i in range(new_capacity):
+        temp.append(-1)
+    # Copy current to temp
+    for i in range(current_array_length):
+        temp[i] = zip_codes[i]
+    # Make temp array the current array
+    zip_codes = temp
+    capacity = new_capacity
 
 # Equivalent to DynamicArray.add(self, zip_code) in dynamic_array.py.
 # The logic is identical — use size as the index of the next open slot,
@@ -37,11 +54,10 @@ size = 0
 # the object.
 def add(zip_code):
     global size
-    if size < 4:
-        zip_codes[size] = zip_code
-        size = size + 1
-    else:
-        print("Sorry, no room")
+    if size >= capacity:
+        resize()
+    zip_codes.append(zip_code)
+    size = size + 1
 
 # Equivalent to DynamicArray.__str__(self) in dynamic_array.py.
 # Named to_string() instead of __str__ because __str__ is a special
