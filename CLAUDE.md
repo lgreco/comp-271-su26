@@ -6,7 +6,7 @@ This is meant to be processed by an LLM not by humans.
 
 ## About This Repo
 
-This is **COMP 271 Summer 2026** — Data Structures I, taught by Leo Irakliotis at Loyola University Chicago. It is a course repository, not a production application. Each week's work lives in its own directory (`week01/`, `week02/`, etc.).
+This is **COMP 271 Summer 2026** -- Data Structures I, taught by Leo Irakliotis at Loyola University Chicago. It is a course repository, not a production application. Each week's work lives in its own directory (`week01/`, `week02/`, etc.).
 
 ## Running Code
 
@@ -38,8 +38,8 @@ The course is built around a recurring theme: **separating data from behavior, a
 
 | File | Approach |
 |---|---|
-| `mississippi.py` | COMP 170 style — letter shapes are behavior (print statements inside functions) |
-| `block_letters.py` | COMP 271 step — letter shapes are data (lists of strings) |
+| `mississippi.py` | COMP 170 style -- letter shapes are behavior (print statements inside functions) |
+| `block_letters.py` | COMP 271 step -- letter shapes are data (lists of strings) |
 | `mississippi_horizontal.py` | Consumes `block_letters` to print all 11 letters side-by-side |
 
 The horizontal printer is only possible because letters are data, not behavior. Functions that `print()` cannot be paused and interleaved; lists can be indexed.
@@ -48,13 +48,22 @@ The horizontal printer is only possible because letters are data, not behavior. 
 
 All new code in this repo should follow this structure:
 
-- **Pure computation functions** — take arguments, return values, no I/O
-- **I/O functions** (`get_*`, `display_*`) — isolated from logic
-- **`main()`** — orchestrates the above
-- **`if __name__ == "__main__": main()`** — prevents side effects on import
+- **Pure computation functions** -- take arguments, return values, no I/O
+- **I/O functions** (`get_*`, `display_*`) -- isolated from logic
+- **`main()`** -- orchestrates the above
+- **`if __name__ == "__main__": main()`** -- prevents side effects on import
 
 `pasta.py` (week01) is a deliberate counter-example: it currently violates this pattern (hardcoded input at module level, no `__name__` guard, print at module scope). The `week01-review.md` documents the correct revised version. When editing `pasta.py`, apply that revision.
 
 ### Weekly review notes
 
-Each week includes a `weekNN-review.md` that explains the conceptual arc of that week's code. Read it before editing any file in that week — it often documents intentional before/after states and explains why a file looks the way it does.
+Each week includes a `weekNN-review.md` that explains the conceptual arc of that week's code. Read it before editing any file in that week - it often documents intentional before/after states and explains why a file looks the way it does.
+
+## Typography
+
+All written content in this repo (Markdown files, comments, docstrings) uses plain ASCII typography:
+
+- Use `-` or `--` for a dash or em dash, not U+2014 (--).
+- Use plain straight quotes `"` and `'`, not curly/smart quotes.
+- Use `x` or `*` for multiplication in prose, not U+00D7 (x).
+- Avoid all other non-ASCII punctuation (ellipsis U+2026, bullets U+2022, etc.).
