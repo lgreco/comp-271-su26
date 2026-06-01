@@ -31,8 +31,7 @@ class DynamicArray:
         self.size = 0
 
     # __str__ is what Python calls when you print() this object.
-    # It builds one string showing all four slots,
-    # including the empty ones (shown as -1).
+    # It builds one string showing all filled slots.
     def __str__(self):
         if self.size == 0:
             output = "nothing to show"
@@ -42,15 +41,15 @@ class DynamicArray:
                 output = output + str(self.zip_codes[i])
                 # Add a comma after every element except the last.
                 # The last index is self.size - 1, so we stop one short.
-                if i < len(self.zip_codes) - 1:
+                if i < self.size - 1:
                     output = output + ", "
             output = output + "]"
         return output
 
     def resize(self):
         temp = list()
-        temp_capacity = RESIZE_BY * self.capacity
-        # Initializa the temp array
+        temp_capacity = self.RESIZE_BY * self.capacity
+        # Initialize the temp array
         for i in range(temp_capacity):
             temp.append(-1)
         # copy existing array to temp
@@ -62,8 +61,8 @@ class DynamicArray:
 
     # add() puts a new zip code into the next open slot.
     # self.size doubles as the index of that open slot —
-    # because we always fill slots in order: 0, then 1, then 2, then 3.
-    # If the box is already full (size has reached 4), we say so and stop.
+    # because we always fill slots in order: 0, then 1, then 2, ...
+    # If the box is full, resize() doubles its capacity before adding.
     def add(self, zip_code):
         if self.size >= self.capacity:
             self.resize()

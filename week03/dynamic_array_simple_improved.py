@@ -1,26 +1,17 @@
-# This file is the answer to the end-of-class challenge from dynamic_array.py:
-#   "How would you do the same thing WITHOUT a class?"
+# A dynamic array built from plain variables and functions — no class needed.
 #
-# Compare the two files side by side. Every concept from the class version
-# reappears here — but the class kept everything neatly packaged together,
-# while here we must manage the pieces ourselves.
+# We need to keep track of two things: the list of zip codes, and a count
+# of how many real values are in it. Both are defined at the top of this
+# file so that every function below can reach them.
 #
-# The class version had:
-#   self.zip_codes  →  one list per object, owned by that object
-#   self.size       →  one counter per object, owned by that object
-#
-# Without a class we use module-level variables instead. There is only one
-# copy of each, shared by all code in this file. That's fine for a single
-# "array" — but the moment we needed two independent arrays, we'd have a
-# problem: there is no way to have two separate zip_codes lists without
-# inventing a second pair of variable names.  Classes solve this by design:
-# each object carries its own state.
+# One catch: because these variables are shared across the whole file,
+# there can only ever be one array here. If you needed two separate arrays,
+# you'd have to create a second pair of variables with different names —
+# zip_codes_2, size_2, and so on. That gets unwieldy fast.
 
-# Both variables together represent the dynamic array.
-# In dynamic_array.py they lived inside __init__ as self.zip_codes and
-# self.size. Here they live at module scope because there is no object to
-# attach them to.
-
+# zip_codes is the list that holds our data. We pre-fill it with -1 as a
+# placeholder: -1 means "this slot hasn't been used yet."
+# size counts how many real zip codes have been added so far.
 capacity = 4
 resize_by = 2
 
@@ -29,7 +20,10 @@ for i in range(capacity):
     zip_codes.append(-1)
 size = 0
 
+# Creates a bigger list, copies everything over, and makes it the new storage.
+# The new list is resize_by times larger than the old one.
 def resize():
+    global zip_codes, capacity
     temp = list()
     current_array_length = len(zip_codes)
     new_capacity = resize_by * capacity
@@ -38,40 +32,29 @@ def resize():
     # Copy current to temp
     for i in range(current_array_length):
         temp[i] = zip_codes[i]
-    # Make temp array the current array
+    # Make temp the current array
     zip_codes = temp
     capacity = new_capacity
 
-# Equivalent to DynamicArray.add(self, zip_code) in dynamic_array.py.
-# The logic is identical — use size as the index of the next open slot,
-# then increment size.
+# Adds a new zip code to the next open slot.
+# We use size as the index of that slot — since we always fill slots in
+# order (0, then 1, then 2, ...), size always points to the first open spot.
+# If the list is already full, resize() makes room before we add.
 #
-# The key difference: we need "global size" to tell Python we want to
-# modify the module-level variable, not create a local one.  In the class
-# version self.size implicitly referred to the object's own attribute —
-# no special keyword required.  The global keyword is a warning sign that
-# reveals shared mutable state; classes eliminate it by scoping state to
-# the object.
+# The line "global size" tells Python: when you see "size" in this function,
+# use the variable defined at the top of the file — don't create a new,
+# separate one just for this function. Without it, updating size here would
+# have no effect anywhere else, and the count would never actually change.
 def add(zip_code):
     global size
     if size >= capacity:
         resize()
-    zip_codes.append(zip_code)
+    zip_codes[size] = zip_code
     size = size + 1
 
-# Equivalent to DynamicArray.__str__(self) in dynamic_array.py.
-# Named to_string() instead of __str__ because __str__ is a special
-# method Python calls automatically on print() — it only makes sense
-# attached to a class.  Without a class, we give the function a plain
-# name and call it explicitly.
-#
-# Spot the difference in the loop range:
-#   class version:  range(self.size)      — shows only filled slots
-#   this version:   range(len(zip_codes)) — shows all four slots, including
-#                   the -1 placeholders for empty ones
-# Neither is wrong; they make different choices about what "display" means.
-# The class version hides the internal -1 sentinel from the caller;
-# this version exposes it, letting you see the underlying storage layout.
+# Builds a string showing every slot in the list, including the -1
+# placeholders for slots not yet filled. This lets you see the full picture:
+# which spots hold real data and which are still waiting to be used.
 def to_string():
     if size == 0:
         output = "nothing to show"
