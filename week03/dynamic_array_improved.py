@@ -1,37 +1,45 @@
-# A class is a blueprint. This blueprint describes a simple container
-# for zip codes — think of it as a small box that holds up to 4 of them.
-# Once we build an object from this blueprint, each object gets its own
-# box and its own count of how full the box is.
+# A dynamic array that grows as needed to hold any number of zip codes.
 #
-# The key idea: the class keeps the list and the counter together,
-# so any code that uses this class never has to juggle them separately.
+# The key improvement over a fixed-size version: no magic numbers.
+# The initial capacity comes in as a parameter; the growth factor is a
+# named constant. Each is defined exactly once and used everywhere —
+# change it in one place and every loop, check, and calculation adjusts
+# automatically.
 #
-# End-of-class challenge (resume Monday):
-#   How would you do the same thing WITHOUT a class —
-#   just plain Python, no blueprints, no objects?
-#   What would you need to keep track of, and how would you do it?
+# Think of a named value as load-bearing: it carries the meaning for every
+# line that references it. A raw literal like 4 scattered across a dozen
+# lines splits that load across a dozen places — miss one when you need to
+# change the value, and you have a bug.
 
 class DynamicArray:
 
+    # RESIZE_BY is the growth factor: each time the array runs out of room,
+    # its capacity is multiplied by this value. Naming it here means the
+    # policy lives in exactly one place. Want to triple instead of double?
+    # Change this line — resize() picks it up without any other edits.
     RESIZE_BY = 2
 
-    # __init__ is the constructor — Python calls it automatically
-    # the moment you create a new object from this class.
-    # Think of it as "set up a fresh, empty box."
+    # Python calls __init__ automatically when you create a new DynamicArray.
+    # capacity is a parameter rather than a hardcoded number, so the caller
+    # decides the starting size. Every loop and comparison below uses
+    # self.capacity, so they all stay correct regardless of what was passed in —
+    # no literals to hunt down and update if the default ever changes.
     def __init__(self, capacity):
-        # We deliberately avoid the one-liner self.zip_codes = [-1] * 4
-        # to show each step clearly: create an empty list, then
-        # add four placeholder values (-1 means "slot not yet used").
+        # Building the list slot-by-slot makes each step visible: create the
+        # list, then fill it. -1 marks a slot as not yet used.
+        # (The one-liner [-1] * self.capacity does the same thing in less code,
+        # but hides the two-step process we want students to see clearly.)
         self.zip_codes = list()
         self.capacity = capacity
         for i in range(self.capacity):
             self.zip_codes.append(-1)
-        # size tracks how many real zip codes we've added so far.
-        # It starts at 0 because the box is empty.
+        # size counts how many real zip codes have been added.
+        # It starts at 0 because no slots are filled yet.
         self.size = 0
 
-    # __str__ is what Python calls when you print() this object.
-    # It builds one string showing all filled slots.
+    # Python calls __str__ automatically whenever you print() this object.
+    # It builds a string showing only the filled slots — range(self.size),
+    # not range(self.capacity), so unused placeholder slots stay hidden.
     def __str__(self):
         if self.size == 0:
             output = "nothing to show"
@@ -46,23 +54,24 @@ class DynamicArray:
             output = output + "]"
         return output
 
+    # Creates a larger storage list and copies all existing values into it.
+    # temp_capacity is computed from two named values — self.RESIZE_BY and
+    # self.capacity — so this method never needs to be edited when either
+    # of those changes. The load is on the names, not on this code.
     def resize(self):
         temp = list()
         temp_capacity = self.RESIZE_BY * self.capacity
-        # Initialize the temp array
         for i in range(temp_capacity):
             temp.append(-1)
-        # copy existing array to temp
         for i in range(self.capacity):
             temp[i] = self.zip_codes[i]
-        # Replace object values
         self.zip_codes = temp
         self.capacity = temp_capacity
 
-    # add() puts a new zip code into the next open slot.
-    # self.size doubles as the index of that open slot —
-    # because we always fill slots in order: 0, then 1, then 2, ...
-    # If the box is full, resize() doubles its capacity before adding.
+    # Adds a new zip code to the next open slot.
+    # self.size serves as the index of that slot — since slots fill in order
+    # (0, then 1, then 2, ...), size always points to the first open one.
+    # If the array is full, resize() makes room before the value is placed.
     def add(self, zip_code):
         if self.size >= self.capacity:
             self.resize()
