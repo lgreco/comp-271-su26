@@ -32,8 +32,8 @@ size = 0
 # The key difference: we need "global size" to tell Python we want to
 # modify the module-level variable, not create a local one.  In the class
 # version self.size implicitly referred to the object's own attribute —
-# no special keyword required.  The global keyword is a code smell that
-# flags shared mutable state; classes eliminate it by scoping state to
+# no special keyword required.  The global keyword is a warning sign that
+# reveals shared mutable state; classes eliminate it by scoping state to
 # the object.
 def add(zip_code):
     global size
