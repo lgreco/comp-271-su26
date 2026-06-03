@@ -83,6 +83,18 @@ No screenshots, no PDFs, no other file types -- Python files only. Confirm with 
 - List only the `.py` files students are expected to submit.
 - Do not mention any other submission method.
 
+Every assignment must also end with a **"How Your Work Is Evaluated"** section immediately after "How to Submit". Use this text verbatim:
+
+```
+## How Your Work Is Evaluated
+
+**Submission credit.** Submitting an assignment earns you 1 point; not submitting earns 0. This is not a score for quality -- it simply records that you completed the work on time.
+
+**No late work, no extensions.** We discuss solutions in class immediately after the deadline, and solutions are posted at the same time. Because the answers are public from that moment on, late submissions cannot be accepted and deadlines cannot be extended.
+
+**Self-evaluation.** After solutions are posted, you evaluate your own work. Using the posted solutions and Leo's written instructions as a guide, you decide what you understood, what you got wrong, and what you need to practice to avoid the same mistakes in the future. Making mistakes is how learning happens. Not repeating them is the evidence that it did.
+```
+
 ## Reading Materials
 
 ### Session startup instruction
