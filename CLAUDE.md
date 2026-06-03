@@ -63,6 +63,14 @@ Each week includes a `weekNN-review.md` that explains the conceptual arc of that
 
 Homework assignments are drafted as Markdown files (`weekNN-assignment.md`) in the corresponding week directory. The companion code file (typically `dynamic_array_assignment.py` or similar) contains stubs with `pass` for students to implement. Do not write assignment content directly into Python files; the `.md` file is the authoritative assignment document.
 
+When any Markdown file references a file that exists in this project, link it using a relative path and backtick-formatted name:
+
+```
+[`file_name.py`](./file_name.py)
+```
+
+Apply this to new files as they are written and to any existing references that are edited.
+
 Every assignment must end with a **"How to Submit"** section. Use this template, substituting the correct week number and the exact `.py` filename(s) students submit:
 
 ```

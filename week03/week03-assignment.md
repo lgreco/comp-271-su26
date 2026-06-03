@@ -107,7 +107,7 @@ safely expose the object's size and capacity without violating that boundary.
 
 ## Overview
 
-The file `dynamic_array_assignment.py` contains a `DynamicArray` class that is
+The file [`dynamic_array_assignment.py`](./dynamic_array_assignment.py) contains a `DynamicArray` class that is
 complete except for five methods marked with `pass`. Your task is to implement
 those five methods. Do not modify any other part of the file.
 
@@ -293,7 +293,7 @@ Implement the five methods below, each currently marked `pass`:
 
 ## Verification
 
-The [assignment file](./dynamic_array_assignment.py contains simple test code to verify the correctness of your work. 
+The [`dynamic_array_assignment.py`](./dynamic_array_assignment.py) contains simple test code to verify the correctness of your work.
 Each `print` statement in `__main__` has an `# expected:` comment. Your output
 should match every expected value. Pay particular attention to:
 
