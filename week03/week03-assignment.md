@@ -269,6 +269,12 @@ Type hints do not replace comments or tests. They describe expected types;
 comments explain non-obvious decisions; tests verify that the code produces the
 right answers. All three layers belong in well-written code.
 
+**Further reading:**
+
+* [Type hints (typing module)](https://docs.python.org/3/library/typing.html) --
+  the reference for Python's `typing` module; covers the built-in types, generic
+  aliases (`list[int]`, `tuple[str, ...]`), and `Optional`.
+
 ---
 
 ## Your Tasks
