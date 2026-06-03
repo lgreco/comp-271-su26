@@ -41,6 +41,13 @@ working with a module you reference only occasionally; the second is reasonable
 when you use the function heavily and the source is obvious from context. The
 assignment file uses the first form.
 
+**Further reading:**
+* [Modules](https://docs.python.org/3/tutorial/modules.html) --
+the full chapter on the module system, import forms, and the standard library.
+* [Mathematics in the standard library](https://docs.python.org/3/tutorial/stdlib.html#mathematics) --
+a short overview of `math`, `random`, and related modules.
+* [Modules and Packages](https://learning.oreilly.com/library/view/introducing-python-3rd/9781098174392/ch12.html) from Bill Lubanovic's book.
+
 ---
 
 ## Part 2: Protected Variables
@@ -64,6 +71,15 @@ The single underscore is the idiomatic choice for data-structure internals. Use
 double underscore only when you specifically need to guard against subclass
 name collisions -- a narrower situation.
 
+**Further reading:**
+
+* [Private Variables](https://docs.python.org/3/tutorial/classes.html#private-variables) --
+explains the single- and double-underscore conventions and name mangling.
+
+* [Class and Instance Variables](https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables) --
+distinguishes variables shared across all instances from variables unique to each one.
+
+* [Objects](https://learning.oreilly.com/library/view/introducing-python-3rd/9781098174392/ch11.html) from Bill Lubanovic's book.
 ---
 
 ## Part 3: Accessor Methods
@@ -94,6 +110,15 @@ convention always means "how many items are in this collection" -- implementing
 `__len__` to return capacity would be wrong, because capacity is not the same
 as length.
 
+**Further reading:**
+
+* [A First Look at Classes](https://docs.python.org/3/tutorial/classes.html#a-first-look-at-classes) --
+covers class definition syntax, instance methods, and the role of `self`.
+* [More on Lists](https://docs.python.org/3/tutorial/datastructures.html#more-on-lists) --
+documents the list methods used by the underlying array in this class.
+
+* [Objects](https://learning.oreilly.com/library/view/introducing-python-3rd/9781098174392/ch11.html) from Bill Lubanovic's book.
+---
 ---
 
 ## Your Tasks
@@ -112,12 +137,7 @@ Implement the five methods below, each currently marked `pass`:
 
 ## Verification
 
-Run the file from the repository root:
-
-```bash
-python week03/dynamic_array_assignment.py
-```
-
+The [assignment file](./dynamic_array_assignment.py contains simple test code to verify the correctness of your work. 
 Each `print` statement in `__main__` has an `# expected:` comment. Your output
 should match every expected value. Pay particular attention to:
 

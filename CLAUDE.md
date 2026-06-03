@@ -63,6 +63,45 @@ Each week includes a `weekNN-review.md` that explains the conceptual arc of that
 
 Homework assignments are drafted as Markdown files (`weekNN-assignment.md`) in the corresponding week directory. The companion code file (typically `dynamic_array_assignment.py` or similar) contains stubs with `pass` for students to implement. Do not write assignment content directly into Python files; the `.md` file is the authoritative assignment document.
 
+## Reading Materials
+
+A reference index of all external materials cited in this course. Access to O'Reilly requires a Loyola University Chicago (LUC) email address at learning.oreilly.com.
+
+### Python Official Documentation (docs.python.org/3/tutorial)
+
+| Topic | URL | Referenced in |
+|---|---|---|
+| Classes (full chapter) | https://docs.python.org/3/tutorial/classes.html | week02-review.md, week03-assignment.md |
+| A First Look at Classes | https://docs.python.org/3/tutorial/classes.html#a-first-look-at-classes | week03-assignment.md Part 3 |
+| Class and Instance Variables | https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables | week03-assignment.md Part 2 |
+| Private Variables | https://docs.python.org/3/tutorial/classes.html#private-variables | week03-assignment.md Part 2 |
+| More on Lists | https://docs.python.org/3/tutorial/datastructures.html#more-on-lists | week03-assignment.md Part 3 |
+| Modules (full chapter) | https://docs.python.org/3/tutorial/modules.html | week03-assignment.md Part 1 |
+| Mathematics in the standard library | https://docs.python.org/3/tutorial/stdlib.html#mathematics | week03-assignment.md Part 1 |
+
+### Introducing Python, 3rd ed. -- Bill Lubanovic (O'Reilly)
+
+| Chapter | Topic | Referenced in |
+|---|---|---|
+| Chapter 8 | Lists | week02-review.md |
+| Chapter 11 | Objects and classes | week02-review.md, week03-assignment.md Part 2 |
+| Chapter 12 | Modules and packages | week03-assignment.md Part 1 |
+
+### Shell and Editor Resources
+
+Referenced in week01-review.md for students who need to build terminal and Vim fluency.
+
+| Resource | URL | Topic |
+|---|---|---|
+| linuxcommand.org | https://linuxcommand.org/lc3_learning_the_shell.php | Bash/terminal introduction |
+| Software Carpentry | https://swcarpentry.github.io/shell-novice/ | Structured shell lessons with exercises |
+| MIT Missing Semester | https://missing.csail.mit.edu/2020/course-shell/ | Shell lecture with video |
+| OpenVim | https://www.openvim.com/ | Interactive in-browser Vim tutorial |
+| Vim Tips Wiki | https://vim.fandom.com/wiki/Category:VimTip | Searchable Vim reference |
+| `vimtutor` | (run in terminal) | Built-in 30-minute Vim walkthrough |
+
+---
+
 ## Typography
 
 All written content in this repo (Markdown files, comments, docstrings) uses plain ASCII typography:
