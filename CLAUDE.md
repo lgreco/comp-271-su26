@@ -63,6 +63,26 @@ Each week includes a `weekNN-review.md` that explains the conceptual arc of that
 
 Homework assignments are drafted as Markdown files (`weekNN-assignment.md`) in the corresponding week directory. The companion code file (typically `dynamic_array_assignment.py` or similar) contains stubs with `pass` for students to implement. Do not write assignment content directly into Python files; the `.md` file is the authoritative assignment document.
 
+Every assignment must end with a **"How to Submit"** section. Use this template, substituting the correct week number and the exact `.py` filename(s) students submit:
+
+```
+## How to Submit
+
+Upload your work on **Sakai** under the assignment for **Week NN**.
+
+Submit only your Python file:
+
+\```
+filename_assignment.py
+\```
+
+No screenshots, no PDFs, no other file types -- Python files only. Confirm with `ls` that the file exists before you upload.
+```
+
+- The Sakai assignment name matches the week the assignment was created (e.g., Week 03, Week 04).
+- List only the `.py` files students are expected to submit.
+- Do not mention any other submission method.
+
 ## Reading Materials
 
 ### Session startup instruction

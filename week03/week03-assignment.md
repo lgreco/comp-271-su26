@@ -252,3 +252,17 @@ should match every expected value. Pay particular attention to:
 - `get_size()` vs `get_capacity()` -- after construction with default arguments
   and three `add()` calls, size is `3` and capacity is `4`. After a fifth add,
   size is `5` and capacity has doubled to `8`.
+
+---
+
+## How to Submit
+
+Upload your work on **Sakai** under the assignment for **Week 03**.
+
+Submit only your Python file:
+
+```
+dynamic_array_assignment.py
+```
+
+No screenshots, no PDFs, no other file types -- Python files only. Confirm with `ls` that the file exists before you upload.
