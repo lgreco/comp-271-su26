@@ -1,3 +1,5 @@
+import math  # use ceil
+
 # A dynamic array whose initial capacity and growth factor are both configurable.
 #
 # The previous version (dynamic_array_improved.py) hardcoded RESIZE_BY = 2 as a
@@ -26,8 +28,8 @@ class DynamicArray:
     # Defining them here means there is one place to change each default, not one
     # per constructor call. This is the same named-constant discipline applied to
     # the magic-number problem from the earlier fixed-size version.
-    DEFAULT_RESIZE_BY = 2
-    DEFAULT_CAPACITY = 4
+    DEFAULT_RESIZE_BY: float = 2.0
+    DEFAULT_CAPACITY:int = 4
 
     # Both parameters are optional. If the caller passes nothing, the object
     # behaves exactly like the previous class: capacity 4, doubles on resize.
@@ -40,31 +42,31 @@ class DynamicArray:
     #
     # This flexibility is the whole point of the "more improved" version.
     def __init__(self, capacity = DEFAULT_CAPACITY, resize_by = DEFAULT_RESIZE_BY):
-        self.zip_codes = list()
-        self.capacity = capacity
+        self._underlying = list()
+        self._capacity = capacity
         # resize_by is stored as an instance variable, not a class constant.
         # The previous version used RESIZE_BY = 2 at the class level, shared by
         # all objects. Here, each object carries its own growth policy, so two
         # DynamicArray objects can have different resize_by values at the same time.
         self.resize_by = resize_by
-        for i in range(self.capacity):
-            self.zip_codes.append(-1)
+        for i in range(self._capacity):
+            self._underlying.append(-1)
         # size counts how many real zip codes have been added.
         # It starts at 0 because no slots are filled yet.
-        self.size = 0
+        self._size = 0
 
-    # Unlike dynamic_array_improved.py, which looped over range(self.size) and
-    # hid the -1 sentinel slots, this version loops over range(self.capacity) so
+    # Unlike dynamic_array_improved.py, which looped over range(self._size) and
+    # hid the -1 sentinel slots, this version loops over range(self._capacity) so
     # every slot is visible -- filled and empty alike. This makes it easy to see
     # the full underlying array during demos: how many slots exist in total, not
     # just how many are currently occupied. A production __str__ would hide the
     # sentinels; here the transparency is intentional.
     def __str__(self):
         output = "["
-        for i in range(self.capacity):
-            output = output + str(self.zip_codes[i])
+        for i in range(self._capacity):
+            output = output + str(self._underlying[i])
             # Add a comma after every element except the last.
-            if i < self.capacity - 1:
+            if i < self._capacity - 1:
                 output = output + ", "
         output = output + "]"
         return output
@@ -80,22 +82,22 @@ class DynamicArray:
     # carefully, trace it back to the line in this method that causes it, and
     # explain in plain English why that line fails for this particular input.
     # Then propose a fix, and justify your choice.
-    def resize(self):
+    def _resize(self):
         temp = list()
-        temp_capacity = self.resize_by * self.capacity
+        temp_capacity = math.ceil((1+self.resize_by) * self._capacity)
         for i in range(temp_capacity):
             temp.append(-1)
-        for i in range(self.capacity):
-            temp[i] = self.zip_codes[i]
-        self.zip_codes = temp
-        self.capacity = temp_capacity
+        for i in range(self._capacity):
+            temp[i] = self._underlying[i]
+        self._underlying = temp
+        self._capacity = temp_capacity
 
     # Adds a new zip code to the next open slot.
-    # self.size serves as the index of that slot -- since slots fill in order
+    # self._size serves as the index of that slot -- since slots fill in order
     # (0, then 1, then 2, ...), size always points to the first open one.
     # If the array is full, resize() makes room before the value is placed.
     def add(self, zip_code):
-        if self.size >= self.capacity:
-            self.resize()
-        self.zip_codes[self.size] = zip_code
-        self.size = self.size + 1
+        if self._size >= self._capacity:
+            self._resize()
+        self._underlying[self._size] = zip_code
+        self._size = self._size + 1
