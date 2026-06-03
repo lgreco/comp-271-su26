@@ -65,6 +65,22 @@ Homework assignments are drafted as Markdown files (`weekNN-assignment.md`) in t
 
 ## Reading Materials
 
+### Session startup instruction
+
+At the beginning of every session, scan every `.md` and `.py` file in the project and update the three tables below -- Python Official Documentation, Introducing Python (Lubanovic), and Shell and Editor Resources -- to reflect any reading links found. Add new rows for links not yet present; update the "Referenced in" column when an existing link appears in a new file. Do not remove rows.
+
+### Format for reading suggestions in new files
+
+When producing a new `weekNN-assignment.md` or `weekNN-review.md`, add a **Further reading** section at the end of each topical part. Each entry must follow this format exactly:
+
+```
+* [Title of material](url) -- short description
+```
+
+Use only links already present in the tables below. Do not invent URLs.
+
+---
+
 A reference index of all external materials cited in this course. Access to O'Reilly requires a Loyola University Chicago (LUC) email address at learning.oreilly.com.
 
 ### Python Official Documentation (docs.python.org/3/tutorial)
