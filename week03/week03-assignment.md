@@ -176,6 +176,18 @@ The single underscore is the idiomatic choice for data-structure internals. Use
 double underscore only when you specifically need to guard against subclass
 name collisions -- a narrower situation.
 
+The name `_underlying` is also a deliberate choice. An earlier version of this
+class called the list `_zip_codes`, which tied the implementation to a single
+domain. Naming an internal container after the data it happens to hold right now
+is a mistake: a class called `DynamicArray` that stores its data in `_zip_codes`
+cannot be reused for temperatures, student IDs, or scores without renaming
+things throughout the code. `_underlying` removes that constraint -- it says
+"this is the technical infrastructure" without implying anything about the
+values stored. The rule generalizes: implementation internals should use
+*structural* names (describing the variable's role in the implementation), not
+*domain* names (describing the data's meaning). Domain meaning belongs to the
+caller.
+
 **Further reading:**
 
 * [Private Variables](https://docs.python.org/3/tutorial/classes.html#private-variables) --
@@ -192,8 +204,8 @@ distinguishes variables shared across all instances from variables unique to eac
 ### `__len__` and `get_size`
 
 `__len__` is one of Python's *dunder* (double-underscore) methods. Python calls
-it automatically when you write `len(da)`. It should return the number of zip
-codes stored -- that is, `_size`. Implementing `__len__` also makes the object
+it automatically when you write `len(da)`. It should return the number of values
+stored -- that is, `_size`. Implementing `__len__` also makes the object
 work with truthiness checks: `if da:` is `True` whenever `_size > 0`.
 
 `get_size()` is a regular method that returns the same value. Why have both?
@@ -204,7 +216,7 @@ has not memorized Python's dunder protocol immediately understands
 
 ### `get_size` vs `get_capacity`
 
-`get_size()` returns `_size` -- the count of real zip codes stored.
+`get_size()` returns `_size` -- the count of values stored.
 
 `get_capacity()` returns `_capacity` -- the total number of slots in the
 underlying array, including the empty sentinel slots.
@@ -224,19 +236,52 @@ documents the list methods used by the underlying array in this class.
 
 * [Objects](https://learning.oreilly.com/library/view/introducing-python-3rd/9781098174392/ch11.html) from Bill Lubanovic's book.
 ---
+
+## Part 4: Type Hints
+
+Python is a *dynamically typed* language: a variable can hold any type of value,
+and Python does not check types when code runs. Type hints (also called type
+annotations) are optional labels that say what type of data a variable,
+parameter, or return value holds. Python ignores them at runtime, but they serve
+two purposes:
+
+- **Documentation.** `def get(self, index: int) -> int:` tells a reader
+  immediately what the method accepts and what it returns, without reading the
+  body or a comment.
+- **Tool support.** Editors and static analyzers (such as `mypy`) read
+  annotations and flag type mismatches before the code runs -- catching errors
+  earlier than a test run would.
+
+The syntax comes in three forms:
+
+```python
+def get(self, index: int) -> int:   # parameter and return type
+def __str__(self) -> str:           # return type only
+self._size: int = 0                 # instance variable
+```
+
+The arrow (`->`) annotates what a method returns. Methods that modify state but
+return nothing are annotated `-> None`. In this class, all stored values are
+integers, so the underlying list is `list[int]`, all counts and indices are
+`int`, and the resize factor is `float`.
+
+Type hints do not replace comments or tests. They describe expected types;
+comments explain non-obvious decisions; tests verify that the code produces the
+right answers. All three layers belong in well-written code.
+
 ---
 
 ## Your Tasks
 
 Implement the five methods below, each currently marked `pass`:
 
-1. `__len__` -- return the number of stored zip codes
-2. `get_size` -- return the number of stored zip codes
+1. `__len__` -- return the number of stored values
+2. `get_size` -- return the number of stored values
 3. `get_capacity` -- return the total number of slots in the underlying array
-4. `get(index)` -- return the zip code at `index` if `0 <= index < _size`;
+4. `get(index)` -- return the value at `index` if `0 <= index < _size`;
    return `-1` for any index outside that range
-5. `index_of(zip_code)` -- return the index of the first occurrence of
-   `zip_code` among positions `0` through `_size - 1`; return `-1` if not found
+5. `index_of(value)` -- return the index of the first occurrence of
+   `value` among positions `0` through `_size - 1`; return `-1` if not found
 
 ---
 

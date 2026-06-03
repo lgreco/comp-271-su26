@@ -9,18 +9,18 @@ import math
 
 class DynamicArray:
 
-    _DEFAULT_RESIZE_BY = 2
-    _DEFAULT_CAPACITY = 4
+    _DEFAULT_RESIZE_BY: float = 2
+    _DEFAULT_CAPACITY: int = 4
 
-    def __init__(self, capacity=_DEFAULT_CAPACITY, resize_by=_DEFAULT_RESIZE_BY):
-        self._underlying = list()
-        self._capacity = capacity
-        self._resize_by = resize_by
+    def __init__(self, capacity: int = _DEFAULT_CAPACITY, resize_by: float = _DEFAULT_RESIZE_BY) -> None:
+        self._underlying: list[int] = list()
+        self._capacity: int = capacity
+        self._resize_by: float = resize_by
         for i in range(self._capacity):
             self._underlying.append(-1)
-        self._size = 0
+        self._size: int = 0
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self._size == 0:
             return "nothing to show"
         output = "["
@@ -31,7 +31,7 @@ class DynamicArray:
         output = output + "]"
         return output
 
-    def resize(self):
+    def resize(self) -> None:
         temp_capacity = math.ceil(self._resize_by * self._capacity)
         temp = list()
         for i in range(temp_capacity):
@@ -41,36 +41,36 @@ class DynamicArray:
         self._underlying = temp
         self._capacity = temp_capacity
 
-    def add(self, zip_code):
+    def add(self, value: int) -> None:
         if self._size >= self._capacity:
             self.resize()
-        self._underlying[self._size] = zip_code
+        self._underlying[self._size] = value
         self._size = self._size + 1
 
-    def __len__(self):
-        # Return the number of zip codes stored in this array.
+    def __len__(self) -> int:
+        # Return the number of values stored in this array.
         # Enables: len(da)
         pass  # replace with your implementation
 
-    def get_size(self):
-        # Return the number of zip codes stored in this array.
+    def get_size(self) -> int:
+        # Return the number of values stored in this array.
         pass  # replace with your implementation
 
-    def get_capacity(self):
+    def get_capacity(self) -> int:
         # Return the total number of slots in the underlying array,
         # including empty sentinel slots.
         pass  # replace with your implementation
 
-    def get(self, index):
-        # Return the zip code at position index.
+    def get(self, index: int) -> int:
+        # Return the value at position index.
         # Valid positions are 0 through _size - 1 (filled slots only).
         # Return -1 for any index outside that range.
         pass  # replace with your implementation
 
-    def index_of(self, zip_code):
-        # Return the position of the first occurrence of zip_code.
+    def index_of(self, value: int) -> int:
+        # Return the position of the first occurrence of value.
         # Search only filled slots: positions 0 through _size - 1.
-        # Return -1 if zip_code is not found.
+        # Return -1 if value is not found.
         pass  # replace with your implementation
 
 
