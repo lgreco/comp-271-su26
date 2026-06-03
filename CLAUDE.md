@@ -90,18 +90,18 @@ A reference index of all external materials cited in this course. Access to O'Re
 | Classes (full chapter) | https://docs.python.org/3/tutorial/classes.html | week02-review.md, week03-assignment.md |
 | A First Look at Classes | https://docs.python.org/3/tutorial/classes.html#a-first-look-at-classes | week03-assignment.md Part 3 |
 | Class and Instance Variables | https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables | week03-assignment.md Part 2 |
-| Private Variables | https://docs.python.org/3/tutorial/classes.html#private-variables | week03-assignment.md Part 2 |
-| More on Lists | https://docs.python.org/3/tutorial/datastructures.html#more-on-lists | week03-assignment.md Part 3 |
-| Modules (full chapter) | https://docs.python.org/3/tutorial/modules.html | week03-assignment.md Part 1 |
-| Mathematics in the standard library | https://docs.python.org/3/tutorial/stdlib.html#mathematics | week03-assignment.md Part 1 |
+| Private Variables | https://docs.python.org/3/tutorial/classes.html#private-variables | week03-assignment.md intro, Part 2 |
+| More on Lists | https://docs.python.org/3/tutorial/datastructures.html#more-on-lists | week03-assignment.md intro, Part 3 |
+| Modules (full chapter) | https://docs.python.org/3/tutorial/modules.html | week03-assignment.md intro, Part 1 |
+| Mathematics in the standard library | https://docs.python.org/3/tutorial/stdlib.html#mathematics | week03-assignment.md intro, Part 1 |
 
 ### Introducing Python, 3rd ed. -- Bill Lubanovic (O'Reilly)
 
 | Chapter | Topic | Referenced in |
 |---|---|---|
 | Chapter 8 | Lists | week02-review.md |
-| Chapter 11 | Objects and classes | week02-review.md, week03-assignment.md Part 2 |
-| Chapter 12 | Modules and packages | week03-assignment.md Part 1 |
+| Chapter 11 | Objects and classes | week02-review.md, week03-assignment.md intro, Part 2 |
+| Chapter 12 | Modules and packages | week03-assignment.md intro, Part 1 |
 
 ### Shell and Editor Resources
 

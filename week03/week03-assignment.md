@@ -1,5 +1,110 @@
 # Week 3 Assignment: DynamicArray Accessors
 
+## This Week in Class
+
+### June 1 -- Dynamic Arrays: From Fixed Capacity to Automatic Resizing
+
+We started from last week's zip-code store: a fixed-size list with a `capacity`
+(total slots) and a `size` (filled slots). When the array was full, the old
+version just printed "sorry." The first goal was to fix that.
+
+Class discussion weighed several options -- hardcoding a bigger number, using a
+variable, pre-allocating the theoretical maximum -- and settled on doubling the
+array size each time it fills up. Doubling keeps arithmetic clean and avoids
+fractional sizes; 50% or 3x growth would work equally well.
+
+The `resize()` method has three steps:
+
+1. Create a new array twice the current size, pre-filled with `-1`.
+2. Copy every element from the old array into the new one.
+3. Replace the current array with the new one and update `capacity`.
+
+We also named a code smell: **magic numbers**. Any literal integer other than
+`-1`, `0`, or `+1` appearing directly in code hides intent. Named variables
+(`capacity = 4`, `resize_by = 2`) document the policy and make it easy to
+change in exactly one place.
+
+The session closed by beginning the transition from the procedural version --
+which needed `global` declarations inside every function -- to a class-based
+version. An object bundles data and behavior together:
+
+- Data: the underlying list, `capacity`, `size`
+- Behavior: `add()`, `resize()`, `__str__()`
+
+The `DynamicArray` class uses `self` to access its own data from any method,
+making `global` unnecessary. The growth factor becomes a class-level constant
+`RESIZE_BY = 2`, and the initial capacity is passed into `__init__()` so the
+caller controls the starting size.
+
+**Further reading:**
+
+* [Classes](https://docs.python.org/3/tutorial/classes.html) -- the full
+  chapter; read the introduction and the sections on class definition and
+  instance objects.
+* [More on Lists](https://docs.python.org/3/tutorial/datastructures.html#more-on-lists)
+  -- documents the list operations the underlying array relies on (append,
+  indexing, length).
+* [Objects and classes](https://learning.oreilly.com/library/view/introducing-python-3rd/9781098174392/ch11.html)
+  -- Chapter 11 of Lubanovic; covers how Python classes work from the ground up.
+
+---
+
+### June 2-3 -- Resize Strategies, Debugging, and Encapsulation
+
+**Resize strategies.** We examined the cost trade-off more carefully: adding
+one extra slot minimizes wasted memory but triggers a copy on every single add.
+Doubling wastes up to half the allocated space but copies rarely. We explored
+percentage-based resizing (e.g., 10%) with a ceiling function to guarantee at
+least one new slot -- balancing both concerns.
+
+The class was updated to accept optional `capacity` and `resize_by` arguments
+with class-level defaults (`DEFAULT_CAPACITY = 4`, `DEFAULT_RESIZE_BY = 2`).
+Testing with `resize_by=0.1` produced a crash, left as a diagnostic exercise
+for the following class.
+
+**Debugging.** The bug was traced with help from Alexander, Temeeka, and Dutch:
+multiplying an integer capacity by a float resize factor produces a float.
+Python's `int()` floors the result, so `int(3 * 1.1)` is `3` -- the array
+never actually grew. The fix is `math.ceil()`, which rounds up and guarantees
+at least one new slot every time.
+
+Two import styles are valid:
+
+```python
+import math           # call as: math.ceil(x)
+from math import ceil  # call as: ceil(x)
+```
+
+Both are correct. The first keeps the module name visible at every call site;
+the second is shorter but hides the origin. Prefer the first when you reference
+the module only occasionally.
+
+**Naming and encapsulation.** We renamed the internal container from `zip_codes`
+to `_underlying`, making the class generic enough to hold any values. Single-
+underscore prefixes on `_underlying`, `_capacity`, `_size`, and `_resize_by`
+signal "do not access this directly." Python does not enforce this -- it relies
+on professional courtesy rather than language rules. Double underscores add name
+mangling (Python rewrites `__name` to `_ClassName__name` at compile time) for
+extra friction, but still do not create true privacy.
+
+The analogy: a car's dashboard is the public interface; the engine internals are
+meant to be left alone. The weekend assignment asks you to write methods that
+safely expose the object's size and capacity without violating that boundary.
+
+**Further reading:**
+
+* [Mathematics in the standard library](https://docs.python.org/3/tutorial/stdlib.html#mathematics)
+  -- a short overview of `math`, `random`, and related modules.
+* [Modules](https://docs.python.org/3/tutorial/modules.html) -- the full chapter
+  on import forms, the standard library, and `from ... import` style.
+* [Private Variables](https://docs.python.org/3/tutorial/classes.html#private-variables)
+  -- explains single- and double-underscore conventions and name mangling in
+  detail.
+* [Modules and packages](https://learning.oreilly.com/library/view/introducing-python-3rd/9781098174392/ch12.html)
+  -- Chapter 12 of Lubanovic; covers the module system and import patterns.
+
+---
+
 ## Overview
 
 The file `dynamic_array_assignment.py` contains a `DynamicArray` class that is
