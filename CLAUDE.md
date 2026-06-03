@@ -59,6 +59,10 @@ All new code in this repo should follow this structure:
 
 Each week includes a `weekNN-review.md` that explains the conceptual arc of that week's code. Read it before editing any file in that week - it often documents intentional before/after states and explains why a file looks the way it does.
 
+### Assignments
+
+Homework assignments are drafted as Markdown files (`weekNN-assignment.md`) in the corresponding week directory. The companion code file (typically `dynamic_array_assignment.py` or similar) contains stubs with `pass` for students to implement. Do not write assignment content directly into Python files; the `.md` file is the authoritative assignment document.
+
 ## Typography
 
 All written content in this repo (Markdown files, comments, docstrings) uses plain ASCII typography:
