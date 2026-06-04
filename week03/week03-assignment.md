@@ -71,7 +71,7 @@ at least one new slot every time.
 Two import styles are valid:
 
 ```python
-import math           # call as: math.ceil(x)
+import math            # call as: math.ceil(x)
 from math import ceil  # call as: ceil(x)
 ```
 
