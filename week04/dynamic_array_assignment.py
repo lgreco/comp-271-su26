@@ -59,91 +59,46 @@ class DynamicArray:
         self._underlying[self._size] = value
         self._size = self._size + 1
 
-    def __len__(broccoli) -> int:
+    def __len__(self) -> int:
         # Return the number of values stored in this array.
         # Enables: len(da) and truthiness checks like "if da:"
-        return broccoli._size
+        return self.get_size()
 
-    def get_size(carrots) -> int:
+    def get_size(self) -> int:
         # Return the number of values stored in this array.
         # Same value as __len__; explicit name for readers unfamiliar with dunder methods.
-        return carrots._size
+        return self._size
 
-    def get_capacity(cabbage) -> int:
+    def get_capacity(self) -> int:
         # Return the total number of slots in the underlying array,
         # including empty sentinel slots. This is the hotel room count, not the guest count.
-        return cabbage._capacity
+        return self._capacity
 
-    def get(anti_corn, index: int) -> int:
+    def get(self, index: int):
         # Return the value at position index.
         # Valid positions are 0 through _size - 1 (filled slots only).
         # Return -1 for any index outside that range -- including negative indices.
         # Caution: Python lists accept negative indices natively; you must check for them
         # explicitly, or get(-1) will silently return the last element instead of -1.
-        if index >= 0 and index < anti_corn._size:
-          return anti_corn._underlying[index]
+        if index >= 0 and index < self._size:
+          return self._underlying[index]
         else:
-          return "Oops"
+          return None
 
     def index_of(self, value: int) -> int:
         # Return the position of the first occurrence of value.
         # Search only filled slots: positions 0 through _size - 1.
         # Do not search sentinel slots -- they all hold -1 and would give false matches.
         # Return -1 if value is not found.
-
         index = -1
-
         i = 0
-
-        while i < self._size and index < 0 
+        while i < self._size and index < 0:
             if self._underlying[i] == value:
                 index = i
             i = i + 1
-        
         return index
 
-
-    def index_of_2(self, value):
-        index = -1
-        for i in range(self._size):
-            if self._underlying[i] == value:
-                index = i
-        return index
- 
-
-if __name__ == "__main__":
-    da = DynamicArray()
-    da.add(10001)
-    da.add(60626)
-    da.add(90210)
-    print(da)                    # expected: [10001, 60626, 90210]
-
-    print()
-    print("__len__ and size/capacity getters")
-    print(len(da))               # expected: 3
-    print(da.get_size())         # expected: 3
-    print(da.get_capacity())     # expected: 4
-
-    print()
-    print("get() tests")
-    print(da.get(0))             # expected: 10001
-    print(da.get(1))             # expected: 60626
-    print(da.get(2))             # expected: 90210
-    print(da.get(-1))            # expected: -1  (below valid range)
-    print(da.get(3))             # expected: -1  (at size, no data there)
-    print(da.get(100))           # expected: -1  (well beyond size)
-
-    print()
-    print("index_of() tests")
-    print(da.index_of(10001))    # expected: 0
-    print(da.index_of(60626))    # expected: 1
-    print(da.index_of(90210))    # expected: 2
-    print(da.index_of(99999))    # expected: -1  (not in array)
-
-    da.add(11111)
-    da.add(22222)
-    print()
-    print("after 2 more adds (triggers resize)")
-    print(da)                    # expected: [10001, 60626, 90210, 11111, 22222]
-    print(len(da))               # expected: 5
-    print(da.get_capacity())     # expected: 8
+    def contains(self, value: int) -> bool:
+        """Return true if value is present in the underlying array
+        and false otherwise"""
+        return self.index_of(value) > -1 
