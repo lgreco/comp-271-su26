@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import math
 
-# Dynamic array -- accessor methods assignment.
+# Dynamic array -- search methods assignment.
 #
-# The class below is complete except for five methods marked with pass.
+# The class below is complete except for two methods marked with pass.
 # Your task: implement those methods according to the spec in their comments.
 # Do not modify any other method.
 # Run this file to check your work against the expected output shown below.
@@ -30,7 +32,7 @@ class DynamicArray:
         # _capacity = total rooms built (slots allocated in _underlying).
         # _size     = rooms currently occupied (values stored by the user).
         # A hotel with 4 rooms and 0 guests is not "empty" -- it still has 4 rooms.
-        self._underlying: list[int] = list()
+        self._underlying: list = list()
         self._capacity: int = capacity
         self._resize_by: float = resize_by
         # Pre-fill every slot with None as a sentinel value that marks "nothing stored here."
@@ -117,7 +119,7 @@ class DynamicArray:
         else:
             return None
 
-    def index_of(self, value: int) -> int:
+    def index_of(self, value) -> int:
         # Linear search: inspect each filled slot in order and return the first match.
         # Time complexity is O(n) in the worst case (value is last or absent).
         # Search only filled slots: positions 0 through _size - 1.
@@ -132,12 +134,47 @@ class DynamicArray:
             i = i + 1
         return index
 
-    def contains(self, value: int) -> bool:
+    def contains(self, value) -> bool:
         # Delegation: reuse index_of rather than re-implementing the search loop.
         # index_of returns -1 when value is absent, so any non-negative result means found.
         # This pattern -- one method as a thin wrapper around another -- avoids duplicating
         # logic and ensures both methods stay in sync if the search algorithm ever changes.
         return self.index_of(value) > -1
+
+    def index_of_all(self, value) -> list[int]:
+        # Return the index position of every occurrence of value in this array.
+        #
+        # Search only the filled slots -- positions 0 through _size - 1.
+        # Sentinel slots (positions _size through _capacity - 1) must not be searched;
+        # they all hold None and would produce false matches for any caller looking for None.
+        #
+        # Build and return a list of all matching indices. Examples:
+        #   If the array holds ["Sam", "Frodo", "Sam", "Pippin"] and value is "Sam",
+        #   return [0, 2].
+        #   If value is not found anywhere, return [] -- an empty list, not None, not -1.
+        #   An empty list is unambiguous: the caller checks "if result:" or "len(result) == 0"
+        #   without needing to special-case a sentinel value.
+        #
+        # Unlike index_of, do not stop at the first match. Continue through every filled slot
+        # so that all occurrences are collected.
+        #
+        # Your method must have exactly one return statement, at the very end.
+        # Build a result list as you scan, then return it once. An empty list
+        # is already the correct answer when value is not found -- no second return needed.
+        pass
+
+    def count(self, value) -> int:
+        # Return the number of times value appears in this array.
+        #
+        # Search only the filled slots -- positions 0 through _size - 1.
+        # If value does not appear, return 0.
+        #
+        # Hint: index_of_all already finds every occurrence. Consider delegating to it
+        # rather than re-implementing the search. A method that does one thing well
+        # is easier to maintain than two methods that each do the same search.
+        #
+        # Your method must have exactly one return statement, at the very end.
+        pass
 
     def remove(self, index: int):
         # Remove the element at position index and return it.
