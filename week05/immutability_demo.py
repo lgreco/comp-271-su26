@@ -1,5 +1,7 @@
 import sys  # for getsizeof()
 
+#hi
+
 # Strings are immutable: "base = base + base" never mutates the existing
 # string object, it builds a brand new one and rebinds the name to it. The
 # id() column below proves this -- it changes on every iteration.
