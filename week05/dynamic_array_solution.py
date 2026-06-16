@@ -2,12 +2,6 @@ from __future__ import annotations
 import math
 
 
-# Dynamic array -- search methods assignment.
-#
-# The class below is complete except for two methods marked with pass.
-# Your task: implement those methods according to the spec in their comments.
-# Do not modify any other method.
-# Run this file to check your work against the expected output shown below.
 
 
 # A dynamic array looks like a plain list to the outside world, but internally
@@ -44,18 +38,30 @@ class DynamicArray:
         # _size starts at 0: zero guests checked in, even though the hotel has rooms.
         self._size: int = 0
 
+    _EMPTY_MESSAGE = "nothing to show"
+    _OPENING_DELIMITER = "[ "
+    _CLOSING_DELIMITER = " ]"
+    _SEPARATING_DELIMITER = ", "
+
     def __str__(self) -> str:
-        if self._size == 0:
-            return "nothing to show"
-        output = "["
-        # Loop up to _size, not _capacity.
-        # Sentinel slots are an internal implementation detail; users should never see them.
-        # Displaying None values beyond _size would expose the underlying structure.
-        for i in range(self._size):
-            output = output + str(self._underlying[i])
-            if i < self._size - 1:
-                output = output + ", "
-        output = output + "]"
+        """String representation for the object.
+
+        Returns:
+        --------
+        str : a nicely formatted string with information about
+              the object and its contents.
+        """
+        # Default value in case the object empty
+        output = self._EMPTY_MESSAGE
+        # If object is not empty, build an output string
+        # Not a memory-safe operation!
+        if self._size > 0:
+            output = self._OPENING_DELIMITER
+            for i in range(self._size):
+                output = output + str(self._underlying[i])
+                if i < self._size - 1:
+                    output = output + self._SEPARATING_DELIMITER
+            output = output + self._CLOSING_DELIMITER
         return output
 
     def _resize(self) -> None:
@@ -114,10 +120,10 @@ class DynamicArray:
         # Python trap: Python lists accept negative indices natively (-1 means last element).
         # Without an explicit check for index < 0, get(-1) would silently return the last
         # stored value instead of None, violating the contract stated above.
+        item_to_return = None
         if index >= 0 and index < self._size:
-            return self._underlying[index]
-        else:
-            return None
+            item_to_return = self._underlying[index]
+        return item_to_return
 
     def index_of(self, value) -> int:
         # Linear search: inspect each filled slot in order and return the first match.
