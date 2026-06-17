@@ -102,7 +102,7 @@ this is a preview of where the course goes after this week's assignment.
 
 ---
 
-## Overview
+## Assignment Overview
 
 This week we step back from extending `DynamicArray` itself and instead
 *use* it as a building block inside a new class. The file
