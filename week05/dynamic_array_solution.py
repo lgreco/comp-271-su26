@@ -64,6 +64,15 @@ class DynamicArray:
             output = output + self._CLOSING_DELIMITER
         return output
 
+    def better_str(self) -> str:
+        output = self._EMPTY_MESSAGE
+        if self._size > 0:
+            items = list()
+            for i in range(self._size):
+                items.append(self._underlying[i])
+            output = "".join(items)
+        return output
+
     def _resize(self) -> None:
         # Compute the new capacity. math.ceil is required here, not int().
         # Example: if _capacity is 3 and _resize_by is 1.1, then 3 * 1.1 = 3.3.
