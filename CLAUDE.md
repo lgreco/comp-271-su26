@@ -127,7 +127,7 @@ A reference index of all external materials cited in this course. Access to O'Re
 
 | Topic | URL | Referenced in |
 |---|---|---|
-| Classes (full chapter) | https://docs.python.org/3/tutorial/classes.html | week02-review.md, week03-assignment.md |
+| Classes (full chapter) | https://docs.python.org/3/tutorial/classes.html | week02-review.md, week03-assignment.md, week05-assignment.md June 15, Part 1 |
 | A First Look at Classes | https://docs.python.org/3/tutorial/classes.html#a-first-look-at-classes | week03-assignment.md Part 3 |
 | Class and Instance Variables | https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables | week03-assignment.md Part 2 |
 | Private Variables | https://docs.python.org/3/tutorial/classes.html#private-variables | week03-assignment.md intro, Part 2 |
@@ -135,6 +135,8 @@ A reference index of all external materials cited in this course. Access to O'Re
 | Modules (full chapter) | https://docs.python.org/3/tutorial/modules.html | week03-assignment.md intro, Part 1 |
 | Mathematics in the standard library | https://docs.python.org/3/tutorial/stdlib.html#mathematics | week03-assignment.md intro, Part 1 |
 | Type hints (typing module) | https://docs.python.org/3/library/typing.html | week03-assignment.md Part 4 |
+| `abc` -- Abstract Base Classes | https://docs.python.org/3/library/abc.html | week05-assignment.md June 16, Part 1 |
+| `str.join` | https://docs.python.org/3/library/stdtypes.html#str.join | week05-assignment.md June 17 |
 
 ### Introducing Python, 3rd ed. -- Bill Lubanovic (O'Reilly)
 

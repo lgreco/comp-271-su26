@@ -22,6 +22,17 @@ class DynamicArray:
     def __init__(
         self, capacity: int = _DEFAULT_CAPACITY, resize_by: float = _DEFAULT_RESIZE_BY
     ) -> None:
+        """Create an empty dynamic array.
+
+        Parameters:
+        -----------
+        capacity : int
+            Number of slots to allocate up front in the underlying list.
+            Defaults to _DEFAULT_CAPACITY.
+        resize_by : float
+            Growth factor applied to capacity whenever the array fills up.
+            Defaults to _DEFAULT_RESIZE_BY.
+        """
         # Think of this array like a hotel.
         # _capacity = total rooms built (slots allocated in _underlying).
         # _size     = rooms currently occupied (values stored by the user).
@@ -65,6 +76,12 @@ class DynamicArray:
         return output
 
     def better_str(self) -> str:
+        """A demonstration of a more efficient way to produce a string
+        representation of the object. This is, ideally, the code we 
+        should use in __str__ above. I keep it separate here to juxtapose
+        the problematic code with cummulative strings (that eat up memory)
+        and this more efficient approach.
+        """
         output = self._EMPTY_MESSAGE
         if self._size > 0:
             items = list()
@@ -74,6 +91,13 @@ class DynamicArray:
         return output
 
     def _resize(self) -> None:
+        """Grow the underlying list when it has no free slots left.
+
+        Allocates a new list of size resize_by * capacity (rounded up),
+        copies every existing slot into it, and replaces _underlying and
+        _capacity. Leading underscore: callers never invoke this directly --
+        add() calls it automatically when needed.
+        """
         # Compute the new capacity. math.ceil is required here, not int().
         # Example: if _capacity is 3 and _resize_by is 1.1, then 3 * 1.1 = 3.3.
         # int(3.3) == 3, so the array would never grow -- an infinite loop on the next add.
@@ -97,6 +121,14 @@ class DynamicArray:
     # 1 + 2 + 3 + ... + N = O(N^2) total work. Doubling means each element is copied
     # at most log2(N) times, giving O(N log N) total -- or O(1) amortized per add.
     def add(self, value) -> None:
+        """Append value as the new last element, resizing first if full.
+
+        Parameters:
+        -----------
+        value : any
+            The item to store. No type restriction -- the array is general
+            purpose.
+        """
         # Resize before writing so there is always a free slot at index _size.
         # After a resize, _underlying is larger but _size is unchanged.
         if self._size >= self._capacity:
@@ -107,22 +139,51 @@ class DynamicArray:
         self._size = self._size + 1
 
     def __len__(self) -> int:
+        """Return the number of values stored, so len(da) works.
+
+        Returns:
+        --------
+        int : same value as get_size().
+        """
         # Implementing __len__ lets Python's built-in len() work: len(da).
         # It also enables truthiness: "if da:" is True when the array is non-empty.
         return self.get_size()
 
     def get_size(self) -> int:
+        """Return how many values the caller has actually stored.
+
+        Returns:
+        --------
+        int : the number of filled slots (the "guests checked in").
+        """
         # Explicit named accessor for readers unfamiliar with dunder methods.
         # Both get_size() and len() return the number of values the user has stored.
         return self._size
 
     def get_capacity(self) -> int:
+        """Return the total number of slots currently allocated.
+
+        Returns:
+        --------
+        int : filled slots plus empty sentinel slots (the "hotel room count").
+        """
         # Total slots in _underlying, including empty sentinel slots.
         # This is the hotel room count, not the guest count.
         # Users rarely need this; it is exposed mainly for testing and debugging.
         return self._capacity
 
     def get(self, index: int):
+        """Return the value stored at index, or None if index is out of range.
+
+        Parameters:
+        -----------
+        index : int
+            Position to read. Valid range is 0 through get_size() - 1.
+
+        Returns:
+        --------
+        any : the stored value, or None if index is negative or >= get_size().
+        """
         # Return the value at position index, or None if index is out of range.
         # Valid range is 0 through _size - 1 (filled slots only; sentinel slots are off-limits).
         #
@@ -135,6 +196,17 @@ class DynamicArray:
         return item_to_return
 
     def index_of(self, value) -> int:
+        """Return the index of the first occurrence of value.
+
+        Parameters:
+        -----------
+        value : any
+            The item to search for among the filled slots.
+
+        Returns:
+        --------
+        int : index of the first match, or -1 if value is not present.
+        """
         # Linear search: inspect each filled slot in order and return the first match.
         # Time complexity is O(n) in the worst case (value is last or absent).
         # Search only filled slots: positions 0 through _size - 1.
@@ -150,6 +222,17 @@ class DynamicArray:
         return index
 
     def contains(self, value) -> bool:
+        """Return whether value is present anywhere in the filled slots.
+
+        Parameters:
+        -----------
+        value : any
+            The item to search for.
+
+        Returns:
+        --------
+        bool : True if value appears at least once, False otherwise.
+        """
         # Delegation: reuse index_of rather than re-implementing the search loop.
         # index_of returns -1 when value is absent, so any non-negative result means found.
         # This pattern -- one method as a thin wrapper around another -- avoids duplicating
@@ -157,41 +240,64 @@ class DynamicArray:
         return self.index_of(value) > -1
 
     def index_of_all(self, value) -> list[int]:
-        # Return the index position of every occurrence of value in this array.
-        #
+        """Return the index of every occurrence of value, in order.
+
+        Parameters:
+        -----------
+        value : any
+            The item to search for among the filled slots.
+
+        Returns:
+        --------
+        list[int] : indices of every match, lowest to highest, or [] if
+                     value does not appear anywhere.
+        """
         # Search only the filled slots -- positions 0 through _size - 1.
         # Sentinel slots (positions _size through _capacity - 1) must not be searched;
         # they all hold None and would produce false matches for any caller looking for None.
         #
-        # Build and return a list of all matching indices. Examples:
-        #   If the array holds ["Sam", "Frodo", "Sam", "Pippin"] and value is "Sam",
-        #   return [0, 2].
-        #   If value is not found anywhere, return [] -- an empty list, not None, not -1.
-        #   An empty list is unambiguous: the caller checks "if result:" or "len(result) == 0"
-        #   without needing to special-case a sentinel value.
-        #
         # Unlike index_of, do not stop at the first match. Continue through every filled slot
         # so that all occurrences are collected.
         #
-        # Your method must have exactly one return statement, at the very end.
-        # Build a result list as you scan, then return it once. An empty list
-        # is already the correct answer when value is not found -- no second return needed.
-        pass
+        # Single-entry / single-exit: build the result list while scanning,
+        # then return it once at the very end. An empty list is already the
+        # correct answer when value is not found -- no second return needed.
+        matches = list()
+        for i in range(self._size):
+            if self._underlying[i] == value:
+                matches.append(i)
+        return matches
 
     def count(self, value) -> int:
-        # Return the number of times value appears in this array.
-        #
-        # Search only the filled slots -- positions 0 through _size - 1.
-        # If value does not appear, return 0.
-        #
-        # Hint: index_of_all already finds every occurrence. Consider delegating to it
-        # rather than re-implementing the search. A method that does one thing well
-        # is easier to maintain than two methods that each do the same search.
-        #
-        # Your method must have exactly one return statement, at the very end.
-        pass
+        """Return how many times value appears among the filled slots.
+
+        Parameters:
+        -----------
+        value : any
+            The item to search for.
+
+        Returns:
+        --------
+        int : number of occurrences, or 0 if value does not appear.
+        """
+        # Delegation: index_of_all already finds every occurrence, so the
+        # count is just the length of that list. Reusing it instead of
+        # re-implementing the search keeps both methods in sync if the
+        # search algorithm ever changes.
+        return len(self.index_of_all(value))
 
     def remove(self, index: int):
+        """Remove and return the element at index, shifting later elements left.
+
+        Parameters:
+        -----------
+        index : int
+            Position to remove. Valid range is 0 through get_size() - 1.
+
+        Returns:
+        --------
+        any : the removed value, or -1 if index is out of range.
+        """
         # Remove the element at position index and return it.
         # To preserve contiguity (no gaps in the filled region), shift every element
         # after the removed one one position to the left.
