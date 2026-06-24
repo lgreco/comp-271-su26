@@ -7,6 +7,12 @@ class Trainline:
         self._head = None
         self._tail = None
 
+    def __iter__(self):
+        cursor = self._head
+        while cursor is not None:
+            yield cursor
+            cursor = cursor.get_next()
+
     def add(self, new_item):
         # Check if line is empty
         if self._head is None:
@@ -18,7 +24,16 @@ class Trainline:
         # The tail can now point to the new station just added
         self._tail = new_item
 
-
+    def contains(self, station_name: str) -> bool:
+        # Assume that named station does not exist in this trainline
+        result: bool = False
+        # do something that may alter the initial value of result
+        # Start at the head and look for the target station
+        cursor = self._head
+        while not result and cursor is not None:
+            result = cursor.get_name() == station_name
+            cursor = cursor.get_next()
+        return result
 
     def add_old_fashion(self, new_station):
         """Adds a new station to the end of the train line.
