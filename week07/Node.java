@@ -1,18 +1,18 @@
-class Node {
+class Node<T> {
 
-    private String payload;
+    private T payload;
     private Node next;
     private Node prev;
 
-    public Node(String payload) {
+    public Node(T payload) {
         this.payload = payload;
         this.next = null;
         this.prev = null;
     }
 
     public static void main(String[] args) {
-        Node test1 = new Node("Chicago");
-        Node test2 = new Node(2026);
+        Node<String> test1 = new Node("Chicago");
+        Node<Int> test2 = new Node(2026);
     }
 
 }
