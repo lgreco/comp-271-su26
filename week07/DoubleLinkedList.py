@@ -1,4 +1,5 @@
-from Node import Node
+# Node.py must be in the same directory as this file for this import to work
+from Node import Node  
 
 class DoubleLinkedList:
 
@@ -17,7 +18,7 @@ class DoubleLinkedList:
             self._head = new_node
         else:
             self._tail.set_next(new_node)
-            if bidirectional:
+            if self._bidirectional:
                 new_node.set_prev(self._tail)
         self._tail = new_node
         self._number_of_nodes += 1
