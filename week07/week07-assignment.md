@@ -1,16 +1,16 @@
-# Week 7 Assignment: Middle Nodes, Direction, and Loops in a Doubly Linked List
+# Week 7 Assignment: O(1) Middle Nodes, Continuity, and Loops in a Doubly Linked List
 
 ## This Week in Class
 
 ### June 29 -- From TrainLine to a Generic Node
 
-We opened by revisiting the `TrainLine` assignment -- `add`, `contains`, `indexOf`, `indexOfAll`, `returnCount`, and `remove` -- and used it as a bridge to a more general data structure. One observation worth carrying forward: `contains` and `indexOf` share redundant logic; `contains` could simply call `indexOf` and check whether the result is meaningful. We will lean on that same delegation idea below.
+We opened by revisiting the `TrainLine` assignment -- `add`, `contains`, `indexOf`, `indexOfAll`, `returnCount`, and `remove` -- and used it as a bridge to a more general data structure. One observation worth carrying forward: `contains` and `indexOf` share redundant logic; `contains` could simply call `indexOf` and check whether the result is meaningful.
 
 Before moving on, we looked at what happens if the caller passes a plain string instead of a `Station` object. Using `isinstance(new_item, str)`, we can detect that case and construct a `Station` from the string. In Java this would be method overloading -- two `add` signatures; Python handles it with an `if` check instead. Type annotations (`: str`, `: Station`, `: T`) are hints, not contracts -- Python runs the code regardless of whether the argument matches the declared type.
 
 We then introduced `Node` as the building block of a doubly linked list. Using `TypeVar` and `Generic` from Python's `typing` module (plus `from __future__ import annotations`), we defined a type parameter `T` so a node's payload can be any object -- a string, an integer, a `Station` -- without changing the class. Each node carries three fields: `payload`, `next`, and `previous`, both links defaulting to `None`.
 
-A doubly linked list lets us traverse in either direction: forward by following `next` pointers, backward by following `previous` pointers. The head node's `previous` is `None`; the tail's `next` is `None`. We can still model a one-directional structure (like the southbound Red Line) by simply leaving the `previous` pointers at `None` -- a doubly linked node used in only one direction. We closed by previewing stacks, queues, and how to detect discontinuities in a bidirectional list -- the discontinuity idea is exactly what Part 5 below asks you to build.
+A doubly linked list lets us traverse in either direction: forward by following `next` pointers, backward by following `previous` pointers. The head node's `previous` is `None`; the tail's `next` is `None`. We can still model a one-directional structure (like the southbound Red Line) by simply leaving the `previous` pointers at `None` -- a doubly linked node used in only one direction. We closed by previewing stacks and queues, and how to detect discontinuities in a bidirectional list -- the discontinuity idea is exactly what Part 2 below asks you to build.
 
 **Further reading:**
 
@@ -28,7 +28,7 @@ A doubly linked list lets us traverse in either direction: forward by following 
 
 With `Node` established, we began building a `DoubleLinkedList` class. The constructor takes no arguments and initializes three fields: `_head` (`None`), `_tail` (`None`), and a node count (`0`).
 
-We explored finding the middle node of a linked list. The naive approach counts all nodes (one full traversal), divides by floor(n/2), then traverses again to reach that position -- two passes. A more elegant one-pass method uses two cursors: a slow cursor moves one node at a time while a fast cursor skips every other node. Using a staircase analogy, we worked out that when the fast cursor reaches the tail, the slow cursor is at the middle. We also reinforced why maintaining a node count field is practical: rather than counting on demand, we update it by +1 on insertion (and -1 on deletion, once `remove` exists) -- so the middle is always reachable in floor(count/2) steps from the head, with no traversal needed just to learn how many nodes there are.
+We explored finding the middle node of a linked list. The naive approach counts all nodes (one full traversal), divides by $\lfloor n/2 \rfloor$, then traverses again to reach that position -- two passes. A more elegant one-pass method uses two cursors: a slow cursor moves one node at a time while a fast cursor skips every other node. Using a staircase analogy developed with Alexander and Jeleel, we worked out that when the fast cursor reaches the tail, the slow cursor is at the middle. We also reinforced why maintaining a node count field is practical: rather than counting on demand, we update it by $+1$ on insertion (and $-1$ on deletion, once `remove` exists) -- so the middle is always reachable in $\lfloor \text{count}/2 \rfloor$ steps from the head, with no traversal needed just to learn how many nodes there are.
 
 **Further reading:**
 
@@ -38,261 +38,212 @@ We explored finding the middle node of a linked list. The naive approach counts 
 
 ---
 
+### July 1 -- Building `add`, and Bidirectionality as a Design Choice
+
+We wrapped up the `Node` discussion by contrasting how Python and Java handle "any type of data." In Python, the type annotations we write are decorative -- the same intent could be captured in a comment and the code would behave identically. In Java, the equivalent notation is enforced by the compiler. Part of why we keep circling back to Java is that COMP 272, the next course in the sequence, is taught in Java.
+
+We then wrote `add`. If the list is empty (`_head` is `None`), the new node becomes both head and tail. Otherwise, the new node is linked after the current tail and becomes the new tail. Either way, the node count is incremented -- a concrete example of trading space for time: maintaining a running count costs a few bytes of memory but avoids re-traversing the whole list every time we need to know its size.
+
+Using escalators, undo/redo (Control-Z/Control-Y), and one-way cassette tapes as analogies, we distinguished unidirectional from bidirectional linked lists, and revised the constructor to accept a directionality parameter, so that setting a new node's `_previous` pointer happens only conditionally. Alexander asked whether a right-to-left unidirectional list would just swap head and tail -- Leo agreed that is the simpler way to *build* one that way. That is a different question from the one Part 5 below asks: given a forward-only list that already exists, how do you reverse it in place?
+
+**Further reading:**
+
+* [The Python Tutorial -- Classes](https://docs.python.org/3/tutorial/classes.html) --
+  covers how instance methods, `self`, and class state work, the
+  foundation of every method you implement this week.
+
+---
+
+One more thing worth naming before you start: `double_linked_list.py` uses class attributes as named constants instead of bare literals, and they live in two different spots for a reason. `_BIDIRECTIONAL`, `_FORWARD_ONLY`, and `_BACKWARD_ONLY` sit at the very top of the class, above `__init__`, because `__init__`'s default argument (`directionality: int = _BIDIRECTIONAL`) is evaluated the moment the class body runs -- if those three were defined later in the file, that line would fail with a `NameError` before you ever created a list. 
+
+The six string pieces used only by `__str__` (`_EMPTY`, `_CAP_LEFT`, `_CAP_RIGHT`, `_LINK_BOTH`, `_LINK_NEXT`, `_LINK_PREV`) have no such constraint, so they sit immediately above the one method that reads them. 
+
+Either way, naming these values -- and marking them private with a leading underscore, since nothing outside this class should depend on them -- turns a comparison like `self.directionality != self._FORWARD_ONLY` into a readable decision instead of a bare `1` you would have to remember the meaning of. 
+
+`__str__` itself is built out of the same three-way branch on `self.directionality` that you will write several more times this week: it picks which pointer is safe to follow (only `_prev` works on a backward-only list, so it walks from `_tail` and reverses the collected payloads before printing), then picks which arrow template to wrap those payloads in, and assembles the final string with a single `str.join` rather than concatenating piece by piece in a loop.
+
+---
+
 ## Overview
 
-The stub file [`double_linked_list_assignment.py`](./double_linked_list_assignment.py) contains a `DoubleLinkedList` class. `__init__`, `add`, `get_count`, `close_loop`, and `has_loop` are already complete. Your job is to implement seven methods: two that find the middle node, two that inspect whether a list's links go only one way, and three that detect broken or looping pointers.
+The stub file [`double_linked_list.py`](./double_linked_list.py) contains a `DoubleLinkedList` class built on [`Node.py`](./Node.py). `__init__`, `add`, `__str__`, `get_middle_slow_fast`, and `has_loop` are already complete. Your job is to implement five methods: one that finds the middle node in $O(1)$, one that checks whether a bidirectional list is fully and correctly linked, two that detect loops in $O(1)$, and one that reverses a forward-only list.
+
+`__init__` sets up four fields:
+
+* `_head` and `_tail` -- the ends of the list, `None` when empty.
+* `count_of_nodes` -- how many nodes have been added, maintained by `add`.
+* `directionality` -- `0` for a fully bidirectional list, `1` for a list that only links `_next` (forward-only), `-1` for a list that only links `_prev` (backward-only). `add` uses this field to decide which pointers to set on every insertion.
 
 Do not modify [`Node.py`](./Node.py).
 
+**A note on type hints.** The type hints throughout `double_linked_list.py` -- including `DoubleLinkedList(Generic[T])` and the `TypeVar` it shares with `Node[T]` -- are more extensive than earlier weeks' code. They are there to demonstrate the concept, not because this assignment requires you to write or maintain them. Type hints are not part of what is graded this week; focus on getting the five methods correct.
+
 ---
 
-## Part 1: `get_middle_by_count`
+## Part 1: `get_middle_node`
 
-`add` already maintains `self._count`, updating it by +1 on every call. This part asks you to put that field to work: find the middle node without ever counting the list yourself.
-
-Implement:
+`get_middle_slow_fast`, already implemented above `get_middle_node` in the stub file, is the slow/fast cursor technique from the June 30 session:
 
 ```python
-def get_middle_by_count(self):
+def get_middle_slow_fast(self):
+    result = None
+    if self._head is not None:
+        slow = self._head
+        fast = self._head
+        while (
+            fast.get_next() is not None
+            and fast.get_next().get_next() is not None
+        ):
+            slow = slow.get_next()
+            fast = fast.get_next().get_next()
+        result = slow.get_payload()
+    return result
 ```
 
-**Contract:**
+It is correct on any list and needs nothing but `_head` and `_next` to work -- but it is $O(n)$: every call walks the list again from the beginning, racing a fast cursor against a slow one.
 
-- Return the payload stored at index `self._count // 2`, counting from the head.
+**Contract for `get_middle_node`:**
+
+- Return the same payload `get_middle_slow_fast` would return, for any list.
 - Return `None` if the list is empty.
-- Do not traverse the list to learn its length -- `self._count` already holds it. The only traversal allowed is the walk from the head to the middle index.
+- Run in $O(1)$: no traversal, no cursor, no loop of any kind inside the method body when it is called.
 
-**Why this method needs only one traversal.**
+**Why this has to change more than just this one method.**
 
-Without a stored count, finding the middle takes two passes: one to count the nodes, one to walk to the middle. Because `_count` is already updated on every `add`, the counting pass disappears -- the division becomes a single field lookup, and the only traversal left is the `count // 2` hops to reach the middle itself. This is the payoff from the June 30 session for keeping `_count` current.
-
-**One return statement.** Your method must have exactly one `return` statement, at the very end. Initialize `result = None` and only walk the cursor and assign `result` when `self._head is not None`.
-
----
-
-## Part 2: `get_middle_two_cursor`
-
-This part asks for the same result as Part 1, reached a completely different way: without reading `self._count` at all.
-
-Implement:
-
-```python
-def get_middle_two_cursor(self):
-```
-
-**Contract:**
-
-- Start a slow cursor and a fast cursor both at `self._head`.
-- On each iteration, advance the slow cursor one node and the fast cursor two nodes.
-- Stop as soon as the fast cursor cannot advance two more nodes. The slow cursor is then on the middle node -- return its payload.
-- Return `None` if the list is empty.
-- `get_middle_by_count` and `get_middle_two_cursor` must return the same payload for the same list -- they describe the same node by two different routes.
-
-**Why this is the "staircase" method from class.**
-
-The fast cursor covers two nodes for every one the slow cursor covers, so by the time fast runs out of nodes, slow has covered half the distance -- one pass, with no separate counting step and no dependence on a maintained `_count` field. This is the technique to reach for whenever the size of a structure is not already tracked.
-
-**One return statement.** Your method must have exactly one `return` statement, at the very end. Initialize `result = None` and only move the cursors and assign `result` when `self._head is not None`.
-
----
-
-## Part 3: `which_direction`
-
-A `DoubleLinkedList` built through `add` links every node in both directions. But nothing stops someone from building one by chaining `Node` objects with only `set_next` calls (a forward-only chain) or only `set_prev` calls (a backward-only chain) -- see `_build_one_directional` in `double_linked_list_assignment.py`, used by `main()` to build exactly these fixtures.
-
-Implement:
-
-```python
-def which_direction(self) -> int:
-```
-
-**Contract:**
-
-- Return `1` if every node's `_prev` is unusable (the list only works by following `_next`).
-- Return `-1` if every node's `_next` is unusable (the list only works by following `_prev`).
-- Return `0` if the list is fully bidirectional, and `0` for an empty list.
-- Use `self._count`: walk forward from `self._head` counting how many nodes you reach, and walk backward from `self._tail` counting how many nodes you reach. Whichever direction reaches all `self._count` nodes -- and the other does not -- tells you the answer.
-
-**Why `self._count` is needed here.**
-
-A forward-only chain has no working `_prev` pointers, so you cannot discover its length by walking backward from the tail -- you would stop after one node. A backward-only chain has the same problem in reverse. `self._count`, set directly by whatever built the list, is what lets you tell "this direction reached every node" apart from "this direction gave up immediately."
-
-**One return statement.** Your method must have exactly one `return` statement, at the very end. Initialize `result = 0` and only change it inside an `if self._head is not None:` block.
-
----
-
-## Part 4: `is_unidirectional`
-
-**Contract:**
-
-- Return `True` if the list's links only go one way (forward-only or backward-only).
-- Return `False` if the list is fully bidirectional, and `False` for an empty list.
-- Delegate entirely to `which_direction`: the entire body is one line, `return self.which_direction() != 0`.
-
-**Why delegation, not a second traversal.**
-
-`which_direction` already walks the list in both directions and knows the answer. Writing a second traversal here would duplicate that logic -- exactly the redundancy we called out in `contains` calling `indexOf` on June 29, and the same principle behind `count` delegating to `index_of_all` in week 6.
-
-**One return statement.** Your method must have exactly one `return` statement, at the very end. It is also the only statement.
-
----
-
-## Part 5: `has_discontinuity`
-
-This is the discontinuity check previewed at the end of the June 29 session. It is different from `is_unidirectional`: a one-directional chain is missing the same pointer on every node, on purpose. A discontinuity is a single broken node in what is otherwise meant to be a normal, fully-linked chain -- the kind of bug that shows up if a pointer update is missed during an insert or remove.
-
-Implement:
-
-```python
-def has_discontinuity(self) -> bool:
-```
-
-**Contract:**
-
-- Walk the list from `self._head` using `get_next()`.
-- For every node that is not `self._head`, its `get_prev()` must not be `None`.
-- For every node that is not `self._tail`, its `get_next()` must not be `None`.
-- Return `True` the moment either check fails anywhere in the list.
-- Return `False` if the whole list is checked with no failures, and `False` for an empty list.
-
-**Why this check is local, not count-based.**
-
-Unlike Part 3, this method is not comparing two full traversals -- it is looking for one bad node among otherwise-good ones. A single node with a missing pointer would not change how far a traversal reaches (you can still walk past it using the other direction's good link), so the count-comparison trick from `which_direction` would not catch it. You have to inspect each node's own pointers directly.
-
-**One return statement.** Your method must have exactly one `return` statement, at the very end. Initialize `result = False` and build the while condition around it (`while cursor is not None and not result`) so the loop stops as soon as a broken node is found.
-
----
-
-## Part 6: `has_infinite_loop`
-
-A doubly linked list can be wired so that it never terminates: the head's `_prev` points somewhere instead of `None`, and the tail's `_next` points somewhere instead of `None`, so the whole structure forms one continuous ring.
-
-Implement:
-
-```python
-def has_infinite_loop(self) -> bool:
-```
-
-**Contract:**
-
-- Return `True` if the list is fully circular: no node has a `_prev` of `None` and no node has a `_next` of `None`.
-- Return `False` for a normal, properly-terminated list.
-- Return `False` for an empty list.
-
-**A warning, not a hint.**
-
-A loop like this has no `None` anywhere to stop at. A traversal that keeps calling `get_next()` (or `get_prev()`) until it finds `None` will never finish on a list like this -- it is not slow, it simply does not end. Whatever approach you take, make sure it is guaranteed to terminate before you run it.
+There is no way to answer "which node is in the middle" in constant time by inspecting the list at query time -- some structure has to already know the answer before `get_middle_node` is ever called. That means the real work happens elsewhere: you will need to add at least one more field to `__init__`, and keep it current inside `add` every time a node is appended, the same way `count_of_nodes` is already kept current. Think about how the identity of the middle node changes, if at all, each time a single node is appended to the end of the list. `get_middle_node` itself should end up being nothing more than reading that field.
 
 **One return statement.** Your method must have exactly one `return` statement, at the very end.
 
 ---
 
-## Part 7: `has_loop_instant`
+## Part 2: `is_continuous`
 
-`has_loop` is already implemented for you, above `has_loop_instant` in the stub file. Read it before writing this part. It is the tortoise-and-hare technique from Parts 1-2, applied to cycle detection instead of middle-finding: a slow cursor and a fast cursor, using only `_next`, so it works even on a one-directional chain. If the chain loops back on itself, the fast cursor eventually laps the slow one; if the chain terminates normally, the fast cursor runs out of nodes first.
+Consider a bidirectional list, fully and correctly linked in both directions:
 
-`has_loop` costs a traversal every time it is called. This part asks for the same answer in O(1) -- the same idea as `_count`, which is updated the moment a node is added rather than counted on demand whenever someone asks.
-
-Implement:
-
-```python
-def has_loop_instant(self) -> bool:
 ```
+<-- A <---> B <---> C <---> D <---> E <---> F -->
+```
+
+Now suppose something goes wrong -- a pointer update is missed during an insert, or corrupted some other way -- and the list becomes:
+
+```
+<-- A <---> B <---> C --> D <---> E <---> F -->
+```
+
+The bidirectionality between `C` and `D` has broken: `D`'s `_prev` now points to `None`, even though `D` is not the head. Every `_next` pointer in the list is still intact, so a simple forward traversal from `A` would never notice anything wrong -- it would print `A B C D E F` exactly as before. The damage is only visible if you also check `_prev`.
+
+This is a different problem from asking whether a list is unidirectional by design (`directionality` of `1` or `-1`): a forward-only or backward-only list is missing the same pointer on *every* node, on purpose. A discontinuity is a break in a list that is supposed to be fully bidirectional.
 
 **Contract:**
 
-- Return the same answer `has_loop` would return, for any list.
-- Do this with no traversal at all.
+- Implement `is_continuous(self) -> bool`, meant to be called only on a bidirectional list.
+- Return `True` if every node's `_next` and `_prev` are consistent with a properly linked bidirectional list.
+- Return `True` for an empty list and for a single-node list.
+- Return `False` the moment a broken link is found anywhere.
 
-**What you need to add.**
+How would you walk the list and check each node's pointers against what a properly linked node in that position should have?
 
-`close_loop`, already provided, links the tail's `_next` back to the head and sets `self._has_loop = True` -- but nothing in `__init__` initializes that field. Add `self._has_loop = False` to `__init__`. If you skip this step, calling `has_loop_instant` on a list that was never looped will raise `AttributeError` -- that crash is telling you the field is missing, not that your logic is wrong.
+**One return statement.** Your method must have exactly one `return` statement, at the very end.
 
-**One return statement.** Your method must have exactly one `return` statement, at the very end. The entire body is one line: `return self._has_loop`.
+---
+
+## Part 3: `has_loop_unidirectional`
+
+`has_loop`, already implemented in the stub file, is the same slow/fast cursor technique applied to cycle detection instead of middle-finding: a slow cursor and a fast cursor, using only `_next`. If the chain loops back on itself, the fast cursor eventually laps the slow one; if the chain terminates normally, the fast cursor runs out of nodes first. It is correct on a forward-only list, but it costs $O(n)$ every time it is called.
+
+**Contract for `has_loop_unidirectional`:**
+
+- Return the same answer `has_loop` would return, for a forward-only (`directionality == 1`) list.
+- Return `False` for a normal, properly terminated forward-only list.
+- Return `False` for an empty list.
+- Run in $O(1)$: no cursor race, no traversal at all.
+
+Think about what a properly maintained `_tail` should look like at the moment this method is called, and what it would mean if it did not look that way.
+
+**One return statement.** Your method must have exactly one `return` statement, at the very end.
+
+---
+
+## Part 4: `has_loop_bidirectional`
+
+A bidirectional list can also be wired so that it never terminates: instead of the head's `_prev` and the tail's `_next` being `None`, they are wired to each other, so the whole structure forms one continuous ring with no true starting or ending point. `has_loop` from Part 3 still correctly reports `True` on a list like this, since a ring is still a cycle when followed through `_next` alone -- but a bidirectional list hands you twice the information a forward-only list does at every node. Can you use the second pointer to answer without a cursor race at all?
+
+**Contract:**
+
+- Implement `has_loop_bidirectional(self) -> bool`, meant to be called only on a bidirectional list.
+- Return `False` for a normal, properly terminated bidirectional list.
+- Return `False` for an empty list.
+- Return `True` if the list has been wired into a closed ring.
+- Run in $O(1)$: no cursor race, no traversal at all.
+
+**One return statement.** Your method must have exactly one `return` statement, at the very end.
+
+---
+
+## Part 5: `reverse`
+
+Given a forward-only (`directionality == 1`) list, reverse it in place, so that traversing it from the new head to the new tail visits every node in the opposite order.
+
+Recall Alexander's question from the July 1 session: if you want a list that reads right-to-left instead of left-to-right, the simplest approach is to build it that way from the start, using `_prev` instead of `_next`. `reverse` is a different problem: the list already exists, built entirely out of `_next` pointers, and you have to turn it around without rebuilding it from scratch.
+
+It is tempting to think this is as simple as swapping `self._head` and `self._tail`. It is not. Swapping the two fields changes which node you *call* the head, but every node's `_next` pointer still points the same physical way it did before -- walking from the "new" head with `get_next()` would dead-end immediately, one hop in. The links themselves have to be rebuilt, one node at a time.
+
+**Contract:**
+
+- Implement `reverse(self) -> None`.
+- After `reverse` runs, printing the list shows the payloads in the opposite order.
+- `directionality` stays `1` (forward-only) when you are done.
+- Must run in $O(n)$.
+- An empty list or a single-node list is already its own reverse -- handle those without crashing.
+
+**One return statement.** Your method must have exactly one `return` statement, at the very end.
 
 ---
 
 ## Verification
 
-After implementing all seven methods, run [`double_linked_list_assignment.py`](./double_linked_list_assignment.py) from the `week07` directory:
+After implementing all five methods, run [`double_linked_list.py`](./double_linked_list.py) from the `week07` directory:
 
 ```
-python3 double_linked_list_assignment.py
+python3 double_linked_list.py
 ```
 
 Check your output against the expected values:
 
 ```
+<-- Howard <---> Jarvis <---> Morse <---> Loyola <---> Granville -->
+Howard --> Jarvis --> Morse -->
+<-- Howard <-- Jarvis <-- Morse
+EMPTY
 Morse
 Morse
-Morse
-Morse
-None
-None
-0
-1
--1
+True
 False
-True
-True
 False
 True
 False
 True
 False
 True
-False
-True
+Howard --> Jarvis --> Morse -->
+Morse --> Jarvis --> Howard -->
 ```
 
-The first six lines test `get_middle_by_count` and `get_middle_two_cursor` on a 5-station list, a 4-station list, and an empty list -- both methods must agree on every line. The next six test `which_direction` and `is_unidirectional` on a normal list plus the forward-only and backward-only fixtures built by `_build_one_directional`. The next two test `has_discontinuity` on a normal list and one with a deliberately broken `_prev`. The next two test `has_infinite_loop` on a normal list and a fully wrapped one. The last four test `has_loop` and `has_loop_instant` on a normal list and a looped one.
+The first four lines test `__str__` (already implemented) on a bidirectional list, a forward-only list, a backward-only list, and an empty list. The next two test `get_middle_slow_fast` and `get_middle_node` on the same 5-station bidirectional list -- both must agree. The next two test `is_continuous` on a normal list and one with a deliberately broken `_prev`. The next four test `has_loop` and `has_loop_unidirectional` on a normal forward-only list and a looped one. The next two test `has_loop_bidirectional` on a normal bidirectional list and a fully wrapped ring. The last two show a forward-only list before and after `reverse`.
 
 Edge cases to verify manually:
 
-- All seven methods return their "empty" value (`None`, `0`, `False`, as appropriate) on a freshly constructed `DoubleLinkedList()` with nothing added.
-- A single-node list is bidirectional (`which_direction` returns `0`), has no discontinuity, has no infinite loop, and has no cycle.
-- Calling `has_loop_instant()` before adding the `self._has_loop = False` line to `__init__` raises `AttributeError` on a list that was never looped -- try it, see the crash, then add the line.
-
----
-
-## Part 8: Reflection -- Pointer Maintenance, Then and Now
-
-This part has no new code. Open your week 6 submission ([`../week06/trainline_assignment.py`](../week06/trainline_assignment.py)) alongside `double_linked_list_assignment.py`. Write your answers as a comment block at the very bottom of `double_linked_list_assignment.py`, below all the code, so the reflection is included when you submit.
-
-```python
-# Part 8 Reflection
-#
-# 1. Your remove() in trainline_assignment.py updated only one pointer per
-#    station (_next), because Station is singly linked. DoubleLinkedList.add
-#    updates two pointers for the same reason in reverse: new_node.set_prev(...)
-#    and self._tail.set_next(...). Why does a doubly linked structure always
-#    need this pair of updates, where a singly linked one only needed the
-#    one? What would happen to which_direction's answer for a list where add
-#    forgot the set_prev call, every single time?
-#
-# 2. is_unidirectional delegates entirely to which_direction, the same way
-#    count() in week 6 delegated to index_of_all(). Find the method in your
-#    week 6 submission that does NOT delegate -- one that could have reused
-#    an existing method's traversal but instead wrote its own loop. Which
-#    method was it, and what existing method could it have called instead?
-#
-# 3. has_discontinuity and has_loop_instant both guard against a problem by
-#    checking something before trusting it -- has_discontinuity checks each
-#    node's pointers directly rather than trusting a stored count, while
-#    has_loop_instant depends entirely on a stored field (_has_loop) instead
-#    of checking anything directly. What has to go right elsewhere in the
-#    class for has_loop_instant's shortcut to stay trustworthy over time --
-#    and what is the equivalent risk for self._count, which get_middle_by_count
-#    and which_direction both trust without double-checking?
-```
+- `get_middle_node`, `is_continuous`, `has_loop_unidirectional`, and `has_loop_bidirectional` all return their "empty" value (`None`, `True`, `False`, `False`, respectively) on a freshly constructed `DoubleLinkedList()` with nothing added.
+- A single-node bidirectional list has no discontinuity and no loop.
+- Calling `reverse()` on an empty list or a single-node forward-only list does not crash, and leaves the list printing exactly as it did before.
 
 ---
 
 ## Further reading
 
 * [The Python Tutorial -- Classes](https://docs.python.org/3/tutorial/classes.html) --
-  covers how instance methods, `self`, and class state work, the foundation
-  of every method you implemented this week.
+  covers how instance methods, `self`, and class state work, the
+  foundation of every method you implemented this week.
 
 * [Type hints (`typing` module)](https://docs.python.org/3/library/typing.html) --
   the reference for `TypeVar` and `Generic`, used by the `Node` class this
@@ -307,7 +258,7 @@ Upload your work on **Sakai** under the assignment for **Week 07**.
 Submit only your Python file:
 
 ```
-double_linked_list_assignment.py
+double_linked_list.py
 ```
 
 No screenshots, no PDFs, no other file types -- Python files only. Confirm with `ls` that the file exists before you upload.
