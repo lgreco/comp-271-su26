@@ -1,4 +1,4 @@
-# Week 7 Assignment: O(1) Middle Nodes, Continuity, and Loops in a Doubly Linked List
+# Week 7 Assignment: $\mathcal O(1)$ Middle Nodes, Continuity, and Loops in a Doubly Linked List
 
 ## This Week in Class
 
