@@ -127,6 +127,7 @@ A reference index of all external materials cited in this course. Access to O'Re
 
 | Topic | URL | Referenced in |
 |---|---|---|
+<<<<<<< HEAD
 | Classes (full chapter) | https://docs.python.org/3/tutorial/classes.html | week02-review.md, week03-assignment.md, week05-assignment.md June 15, Part 1, week07-assignment.md June 29, June 30, July 1, Further reading |
 | A First Look at Classes | https://docs.python.org/3/tutorial/classes.html#a-first-look-at-classes | week03-assignment.md Part 3 |
 | Class and Instance Variables | https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables | week03-assignment.md Part 2 |
@@ -136,6 +137,17 @@ A reference index of all external materials cited in this course. Access to O'Re
 | Mathematics in the standard library | https://docs.python.org/3/tutorial/stdlib.html#mathematics | week03-assignment.md intro, Part 1 |
 | Type hints (typing module) | https://docs.python.org/3/library/typing.html | week03-assignment.md Part 4, week07-assignment.md June 29, Further reading |
 | `abc` -- Abstract Base Classes | https://docs.python.org/3/library/abc.html | week05-assignment.md June 16, Part 1 |
+=======
+| Classes (full chapter) | https://docs.python.org/3/tutorial/classes.html | week02-review.md, week03-assignment.md, week05-assignment.md June 15, Part 1, week06-assignment.md, week07-assignment.md |
+| A First Look at Classes | https://docs.python.org/3/tutorial/classes.html#a-first-look-at-classes | week03-assignment.md Part 3, week04-assignment.md |
+| Class and Instance Variables | https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables | week03-assignment.md Part 2, week04-assignment.md |
+| Private Variables | https://docs.python.org/3/tutorial/classes.html#private-variables | week03-assignment.md intro, Part 2, week04-assignment.md |
+| More on Lists | https://docs.python.org/3/tutorial/datastructures.html#more-on-lists | week03-assignment.md intro, Part 3, week04-assignment.md |
+| Modules (full chapter) | https://docs.python.org/3/tutorial/modules.html | week03-assignment.md intro, Part 1 |
+| Mathematics in the standard library | https://docs.python.org/3/tutorial/stdlib.html#mathematics | week03-assignment.md intro, Part 1 |
+| Type hints (typing module) | https://docs.python.org/3/library/typing.html | week03-assignment.md Part 4, week04-assignment.md, week07-assignment.md |
+| `abc` -- Abstract Base Classes | https://docs.python.org/3/library/abc.html | week05-assignment.md June 16, Part 1, week06-assignment.md |
+>>>>>>> w7
 | `str.join` | https://docs.python.org/3/library/stdtypes.html#str.join | week05-assignment.md June 17 |
 
 ### Introducing Python, 3rd ed. -- Bill Lubanovic (O'Reilly)
