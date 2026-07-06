@@ -66,7 +66,7 @@ Either way, naming these values -- and marking them private with a leading under
 
 ## Overview
 
-The stub file [`double_linked_list.py`](./double_linked_list.py) contains a `DoubleLinkedList` class built on [`Node.py`](./Node.py). `__init__`, `add`, `__str__`, `get_middle_slow_fast`, and `has_loop` are already complete. Your job is to implement five methods: one that finds the middle node in $O(1)$, one that checks whether a bidirectional list is fully and correctly linked, two that detect loops in $O(1)$, and one that reverses a forward-only list.
+The stub file [`double_linked_list.py`](./double_linked_list.py) contains a `DoubleLinkedList` class built on [`Node.py`](./Node.py). `__init__`, `add`, `__str__`, `get_middle_slow_fast`, and `has_loop` are already complete. Your job is to implement five methods: one that finds the middle node in $\mathcal O(1)$, one that checks whether a bidirectional list is fully and correctly linked, two that detect loops in $\mathcal O(1)$, and one that reverses a forward-only list.
 
 `__init__` sets up four fields:
 
@@ -149,14 +149,14 @@ How would you walk the list and check each node's pointers against what a proper
 
 ## Part 3: `has_loop_unidirectional`
 
-`has_loop`, already implemented in the stub file, is the same slow/fast cursor technique applied to cycle detection instead of middle-finding: a slow cursor and a fast cursor, using only `_next`. If the chain loops back on itself, the fast cursor eventually laps the slow one; if the chain terminates normally, the fast cursor runs out of nodes first. It is correct on a forward-only list, but it costs $O(n)$ every time it is called.
+`has_loop`, already implemented in the stub file, is the same slow/fast cursor technique applied to cycle detection instead of middle-finding: a slow cursor and a fast cursor, using only `_next`. If the chain loops back on itself, the fast cursor eventually laps the slow one; if the chain terminates normally, the fast cursor runs out of nodes first. It is correct on a forward-only list, but it costs $\mathcal O(n)$ every time it is called.
 
 **Contract for `has_loop_unidirectional`:**
 
 - Return the same answer `has_loop` would return, for a forward-only (`directionality == 1`) list.
 - Return `False` for a normal, properly terminated forward-only list.
 - Return `False` for an empty list.
-- Run in $O(1)$: no cursor race, no traversal at all.
+- Run in $\mathcal O(1)$: no cursor race, no traversal at all.
 
 Think about what a properly maintained `_tail` should look like at the moment this method is called, and what it would mean if it did not look that way.
 
@@ -174,7 +174,7 @@ A bidirectional list can also be wired so that it never terminates: instead of t
 - Return `False` for a normal, properly terminated bidirectional list.
 - Return `False` for an empty list.
 - Return `True` if the list has been wired into a closed ring.
-- Run in $O(1)$: no cursor race, no traversal at all.
+- Run in $\mathcal O(1)$: no cursor race, no traversal at all.
 
 **One return statement.** Your method must have exactly one `return` statement, at the very end.
 
