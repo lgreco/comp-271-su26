@@ -310,9 +310,15 @@ class DoubleLinkedList(Generic[T]):
             current = following
         self._head = previous
 
-    def remove_from_tail(self) -> Node:
+    def remove_from_tail(self) -> Node[T] | None:
         """Remove the tail node from this list and return it. If the
         list is empty, return None.
+
+        Meant to be called only on a bidirectional list (directionality
+        == _BIDIRECTIONAL): finding the new tail requires following the
+        old tail's _prev pointer, which is never set on a forward-only
+        list and would make this method crash trying to call
+        set_next() on None.
         """
         removed_node: Node[T] | None = self._tail
         if removed_node is not None:
@@ -328,13 +334,22 @@ class DoubleLinkedList(Generic[T]):
                 self._tail = removed_node.get_prev()
                 self._tail.set_next(None)
             self.count_of_nodes -= 1
-            # Keep _middle current. 
-            self._update_middle_on_remove()
+            # Keep _middle current -- removing from the tail needs its
+            # own rule, distinct from removing from the head. See
+            # _update_middle_on_remove_tail for why the two cannot
+            # share one rule.
+            self._update_middle_on_remove_tail()
         return removed_node
-    
-    def remove_from_head(self) -> Node:
+
+    def remove_from_head(self) -> Node[T] | None:
         """Remove the head node from this list and return it. If the
         list is empty, return None.
+
+        Meant to be called only on a bidirectional list (directionality
+        == _BIDIRECTIONAL): finding the new head requires following the
+        old head's _next pointer and then setting *its* _prev to None,
+        which is never meaningful on a backward-only list and would
+        make this method crash trying to call set_prev() on None.
         """
         removed_node: Node[T] | None = self._head
         if removed_node is not None:
@@ -350,27 +365,102 @@ class DoubleLinkedList(Generic[T]):
                 self._head = removed_node.get_next()
                 self._head.set_prev(None)
             self.count_of_nodes -= 1
-            # Keep _middle current. 
-            self._update_middle_on_remove()
+            # Keep _middle current -- removing from the head needs its
+            # own rule, distinct from removing from the tail. See
+            # _update_middle_on_remove_head for why the two cannot
+            # share one rule.
+            self._update_middle_on_remove_head()
         return removed_node
-    
-    def _update_middle_on_remove(self) -> None:
-        """Update the _middle pointer after a node has been removed from 
-        either end of the list."""
-        # The middle index of a list of length n is (n - 1) // 2, and working 
-        # out a few lengths by hand shows the pattern: it only moves when the 
-        # count becomes even (2, 4, 6, ...); every time the count becomes odd, 
-        # the middle node from before is still correct and nothing has to move. 
-        # The very first node is a special case -- there is no previous middle 
-        # to move from, so it simply becomes None.
+
+    def _update_middle_on_remove_tail(self) -> None:
+        """Update the _middle pointer after a node has been removed
+        from the tail. Call this only after count_of_nodes has already
+        been decremented -- every comparison below reads
+        count_of_nodes as the new (shorter) length.
+
+        Removing the tail only shortens the list from the back: every
+        surviving node keeps the exact identity and position it had
+        before, relative to the head. So the question is only ever
+        "does the old middle node still sit at index (new_length - 1)
+        // 2, or does it need to shift back by one?" -- never forward,
+        because nothing was removed from the front.
+
+        Working the answer out by hand for a few lengths, comparing
+        the middle index before removal to the middle index after
+        (both by the same (L - 1) // 2 formula add() already relies
+        on), shows the index only steps back by one when the *new*
+        length is even; every time the new length is odd, the old
+        middle is still standing in the right spot:
+
+            old length | old mid idx | new length | new mid idx | moved?
+                 2      |      0      |      1     |      0      |  no
+                 3      |      1      |      2     |      0      |  yes, back one
+                 4      |      1      |      3     |      1      |  no
+                 5      |      2      |      4     |      1      |  yes, back one
+                 6      |      2      |      5     |      2      |  no
+                 7      |      3      |      6     |      2      |  yes, back one
+
+        new length even -> _middle steps back one (get_prev());
+        new length odd  -> _middle is already correct, do nothing.
+
+        This is the mirror image of add()'s own rule (which steps
+        _middle forward when the count *becomes* odd on insert): here
+        the list is shrinking from the opposite end from where add()
+        grows it, so the parity that triggers a move flips too.
+        """
         if self.count_of_nodes == 0:
             self._middle = None
         elif self.count_of_nodes % 2 == 0:
             if self._middle is not None:
                 self._middle = self._middle.get_prev()
-        else:
+        # else: new length is odd -- the middle from before this
+        # removal is already the correct node; nothing to do.
+
+    def _update_middle_on_remove_head(self) -> None:
+        """Update the _middle pointer after a node has been removed
+        from the head. Call this only after count_of_nodes has already
+        been decremented -- every comparison below reads
+        count_of_nodes as the new (shorter) length.
+
+        This is *not* the same problem _update_middle_on_remove_tail
+        solves. Removing the head does not just shorten the list --
+        it renumbers every surviving node's position, since whatever
+        used to be at index 1 is now at index 0, index 2 is now index
+        1, and so on. So "the old middle node" and "the node now
+        sitting at the middle index" can disagree even when nothing
+        physically moved.
+
+        Working out, by hand, which original node ends up at index
+        (new_length - 1) // 2 of the shrunken list -- by converting
+        that new-list index back to the original numbering (add 1,
+        since the head that shifted everyone was removed) -- shows the
+        opposite parity rule from tail removal applies:
+
+            old length | old mid idx | new length | new mid idx (orig. numbering) | moved?
+                 2      |      0      |      1     |       1        |  yes, forward one
+                 3      |      1      |      2     |       1        |  no
+                 4      |      1      |      3     |       2        |  yes, forward one
+                 5      |      2      |      4     |       2        |  no
+                 6      |      2      |      5     |       3        |  yes, forward one
+                 7      |      3      |      6     |       3        |  no
+
+        new length odd  -> _middle steps forward one (get_next());
+        new length even -> _middle is already correct, do nothing.
+
+        Note the two rules are mirror images of each other in both
+        the triggering parity (even vs. odd) and the direction of
+        movement (get_prev() vs. get_next()). Using one shared rule
+        for both operations -- as an earlier version of this file did
+        -- silently corrupts _middle, because each operation needs the
+        *other* operation's correction roughly half the time.
+        """
+        if self.count_of_nodes == 0:
+            self._middle = None
+        elif self.count_of_nodes % 2 == 1:
             if self._middle is not None:
                 self._middle = self._middle.get_next()
+        # else: new length is even -- the middle from before this
+        # removal is already the correct node; nothing to do.
 
 
 def main() -> None:
@@ -445,6 +535,54 @@ def main() -> None:
     print(reversible)  # expected: Howard --> Jarvis --> Morse -->
     reversible.reverse()
     print(reversible)  # expected: Morse --> Jarvis --> Howard -->
+
+    # remove_from_tail and remove_from_head must each keep _middle in
+    # sync with get_middle_slow_fast after every single removal, not
+    # just after every add() -- that is exactly the invariant
+    # _update_middle_on_remove_tail and _update_middle_on_remove_head
+    # exist to protect. Two fresh 5-station bidirectional lists are
+    # walked down to nothing, one node at a time from the tail and
+    # then, separately, one node at a time from the head, printing
+    # both values together (get_middle_node, get_middle_slow_fast) at
+    # every length so the two can be eyeballed against each other, and
+    # asserting they agree so a regression fails loudly instead of
+    # silently printing the wrong answer.
+    #
+    # Expected pairs while trimming from the tail (5 down to 0 nodes):
+    #   Morse Morse
+    #   Jarvis Jarvis
+    #   Jarvis Jarvis
+    #   Howard Howard
+    #   Howard Howard
+    #   None None
+    trimmed_from_tail: DoubleLinkedList[str] = DoubleLinkedList()
+    for name in stations:
+        trimmed_from_tail.add(name)
+    while trimmed_from_tail.count_of_nodes > 0:
+        middle_fast = trimmed_from_tail.get_middle_node()
+        middle_slow = trimmed_from_tail.get_middle_slow_fast()
+        print(middle_fast, middle_slow)
+        assert middle_fast == middle_slow, "get_middle_node disagreed with get_middle_slow_fast after remove_from_tail"
+        trimmed_from_tail.remove_from_tail()
+    print(trimmed_from_tail.get_middle_node(), trimmed_from_tail.get_middle_slow_fast())  # expected: None None
+
+    # Expected pairs while trimming from the head (5 down to 0 nodes):
+    #   Morse Morse
+    #   Morse Morse
+    #   Loyola Loyola
+    #   Loyola Loyola
+    #   Granville Granville
+    #   None None
+    trimmed_from_head: DoubleLinkedList[str] = DoubleLinkedList()
+    for name in stations:
+        trimmed_from_head.add(name)
+    while trimmed_from_head.count_of_nodes > 0:
+        middle_fast = trimmed_from_head.get_middle_node()
+        middle_slow = trimmed_from_head.get_middle_slow_fast()
+        print(middle_fast, middle_slow)
+        assert middle_fast == middle_slow, "get_middle_node disagreed with get_middle_slow_fast after remove_from_head"
+        trimmed_from_head.remove_from_head()
+    print(trimmed_from_head.get_middle_node(), trimmed_from_head.get_middle_slow_fast())  # expected: None None
 
 
 if __name__ == "__main__":
