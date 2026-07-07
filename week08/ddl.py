@@ -90,7 +90,6 @@ class DoubleLinkedList(Generic[T]):
         # always the new tail.
         self._tail = new_node
         self.count_of_nodes += 1
-
         # Keep _middle current. The middle index of a list of length n
         # is (n - 1) // 2, and working out a few lengths by hand shows
         # the pattern: it only advances by one node the moment the
@@ -356,8 +355,14 @@ class DoubleLinkedList(Generic[T]):
         return removed_node
     
     def _update_middle_on_remove(self) -> None:
-        """Update the _middle pointer after a node has been removed from the list."""
-        # The middle index of a list of length n is (n - 1) // 2, and working out a few lengths by hand shows the pattern: it only moves when the count becomes even (2, 4, 6, ...); every time the count becomes odd, the middle node from before is still correct and nothing has to move. The very first node is a special case -- there is no previous middle to move from, so it simply becomes None.
+        """Update the _middle pointer after a node has been removed from 
+        either end of the list."""
+        # The middle index of a list of length n is (n - 1) // 2, and working 
+        # out a few lengths by hand shows the pattern: it only moves when the 
+        # count becomes even (2, 4, 6, ...); every time the count becomes odd, 
+        # the middle node from before is still correct and nothing has to move. 
+        # The very first node is a special case -- there is no previous middle 
+        # to move from, so it simply becomes None.
         if self.count_of_nodes == 0:
             self._middle = None
         elif self.count_of_nodes % 2 == 0:
