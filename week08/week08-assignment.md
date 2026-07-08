@@ -10,9 +10,15 @@ We then worked out two special-case removals from a fully connected doubly linke
 
 We closed by noting that once a list supports adding and removing from either end in constant time, two classic abstractions fall out of it almost for free: a queue (first in, first out) and a stack (last in, first out).
 
-### July 8 -- Stacks and Queues
+### July 8 -- Recursion, Stacks, and Queues
 
-Today's session builds directly on that observation, but with a twist: instead of a linked list, we build `Stack` and `Queue` on top of a plain Python list of fixed capacity. Once that list is full, no more items can be pushed or enqueued -- the collection simply refuses, rather than growing to make room.
+We opened by revisiting the factorial calculation: first the "naive" loop with an accumulator starting at 1, then the recursive version using $n! = n \times (n-1)!$ with $0! = 1$ as the base case. Pushing the recursive version to its limits -- computing factorials of increasingly large numbers -- eventually triggered a maximum recursion depth error, which became the bridge into why recursion depends on a stack.
+
+A role-play with several students passing a factorial request down a chain, then passing answers back up, modeled how each recursive call is a pending "order" placed on a stack, resolved last-in-first-out starting from the base case. This connects to computer architecture: a dedicated stack register in the CPU tracks the next instruction to execute, which is why stacks underlie both recursion and iterative control flow. A second example -- traversing a map of locations to see whether a path exists -- showed stacks used for backtracking through unexplored choices.
+
+From there we defined the core stack and queue operations: `push`/`pop` for stacks (last in, first out) and `enqueue`/`dequeue` for queues (first in, first out), plus `peek`, `size`, and `is_empty`. We worked through why a queue backed by a fixed-size array requires shifting all remaining elements after a removal -- an $\mathcal O(n)$ operation -- versus the constant-time push/pop or enqueue/dequeue possible with a linked list, where only the head or tail pointer moves.
+
+Today's assignment builds on that comparison, but with a twist: instead of a linked list, we build `Stack` and `Queue` on top of a plain Python list of fixed capacity. Once that list is full, no more items can be pushed or enqueued -- the collection simply refuses, rather than growing to make room.
 
 A stack supports `push` (add) and `pop` (remove) -- last in, first out. A queue supports `enqueue` (add) and `dequeue` (remove) -- first in, first out. Both also need a `peek` (look at what would be removed next, without removing it), an `is_empty` check, and a `size`. Once we write both classes side by side, the overlap is hard to miss: `is_empty`, `size`, and `peek` all come down to the same few lines of code, checking or indexing into an internal list. That overlap is exactly what a superclass is for.
 
