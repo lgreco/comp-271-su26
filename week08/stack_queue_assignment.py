@@ -10,8 +10,8 @@ T = TypeVar("T")
 #
 # This file has three classes, each with method stubs marked pass:
 #   1. BoundedCollection -- the superclass shared by Stack and Queue
-#   2. Stack              -- push, pop
-#   3. Queue               -- enqueue, dequeue
+#   2. Stack             -- push, pop
+#   3. Queue             -- enqueue, dequeue
 #
 # BoundedCollection.__init__ is already complete -- do not change it.
 # Everything else marked pass is yours to implement.
