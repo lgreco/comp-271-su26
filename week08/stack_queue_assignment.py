@@ -26,18 +26,22 @@ class BoundedCollection(Generic[T]):
     ordinary class that happens to hold the behavior Stack and Queue
     have in common.
 
-    Subclasses are expected to set the class attribute _PEEK_INDEX to
-    the list index that peek() and _remove() should act on. A Stack
-    and a Queue disagree about which end of the list matters for
-    removal, but agree on almost everything else -- that disagreement
-    is the only thing _PEEK_INDEX needs to capture.
-    """
+    No list shortcuts: list.insert(index, value), list.pop(index) with
+    an index, and list.remove(value) are off limits everywhere in this
+    file, because they hide their own O(n) shifting inside C code. The
+    only allowed ways to change len(self._items) are
+    self._items.append(item) (grow by one, at the end) and
+    self._items.pop() with NO argument (shrink by one, at the end).
+    Both are O(1). Any other shifting -- moving existing items to open
+    or close a gap -- must be a loop you write yourself, indexing into
+    self._items directly.
 
-    # Overridden by Stack and Queue below. Left as None here so that a
-    # BoundedCollection used directly (rather than through a subclass)
-    # fails loudly the moment peek/_add/_remove try to use it, instead
-    # of silently guessing an end.
-    _PEEK_INDEX: int | None = None
+    Because of how Stack.push and Queue.enqueue call _add() below, the
+    item due to come out next is always at self._items[0], for both
+    classes. peek() and _remove() can therefore hardcode index 0 --
+    neither one needs a _PEEK_INDEX-style hook to know which end of
+    the list matters.
+    """
 
     def __init__(self, capacity: int) -> None:
         """Create an empty collection that will hold at most capacity
@@ -93,21 +97,34 @@ class BoundedCollection(Generic[T]):
         pass
 
     def peek(self) -> T | None:
-        """Return the item that the next _remove() call would remove,
-        without removing it. Return None if the collection is empty.
+        """Return self._items[0], without removing it. Return None if
+        the collection is empty.
 
-        Use self._PEEK_INDEX -- do not hardcode 0 or -1 here. The
-        whole point of this method living on the superclass is that it
-        works for both Stack and Queue, whichever _PEEK_INDEX they set.
+        Hardcode index 0 here -- see the class docstring for why that
+        is always the correct index for both Stack and Queue.
 
         One return statement, at the very end.
         """
         pass
 
-    def _add(self, item: T) -> bool:
-        """Append item to the end of the backing list, unless the
-        collection is already full. Return True if the item was added,
-        False if it was rejected because the collection was full.
+    def _add(self, item: T, index: int) -> bool:
+        """Insert item at position index in the backing list, unless
+        the collection is already full. Return True if the item was
+        added, False if it was rejected because the collection was
+        full.
+
+        Handle this generally rather than special-casing index == 0
+        and index == self.size():
+        - Grow the list by one slot first: self._items.append(item)
+          (the value appended does not matter yet -- it is a
+          placeholder that becomes the last slot).
+        - If index is less than the new last index, shift every item
+          from the old last index down to index one position to the
+          right, working backwards (highest index first) so nothing
+          gets overwritten before it is moved.
+        - Write item into self._items[index].
+
+        No list.insert(...) -- write the shifting loop yourself.
 
         Not part of the public Stack/Queue vocabulary by itself --
         push() and enqueue() below both just call this.
@@ -117,8 +134,19 @@ class BoundedCollection(Generic[T]):
         pass
 
     def _remove(self) -> T | None:
-        """Remove and return the item at self._PEEK_INDEX. Return None,
-        and remove nothing, if the collection is empty.
+        """Remove and return self._items[0]. Return None, and remove
+        nothing, if the collection is empty.
+
+        - Save self._items[0] to return later.
+        - Shift every remaining item one position to the left, so the
+          gap at index 0 closes: self._items[i] = self._items[i + 1]
+          for each i from 0 up to (but not including) the last index.
+        - Shrink the list by one slot: self._items.pop() with NO
+          argument (this just drops the now-duplicated last slot; it
+          does no shifting of its own).
+
+        No list.pop(0) and no list.remove(...) -- write the shifting
+        loop yourself.
 
         Not part of the public Stack/Queue vocabulary by itself --
         pop() and dequeue() below both just call this.
@@ -134,14 +162,11 @@ class Stack(BoundedCollection[T]):
     removes and returns the item most recently pushed.
 
     Contract:
-    - Set _PEEK_INDEX so that peek/pop act on the top of the stack --
-      the end of the backing list that push() adds to.
-    - push(item) returns True if the item was added, False if the
-      stack was already full.
+    - push(item) inserts at index 0 (see _add), so the top of the
+      stack is always self._items[0]. Returns True if the item was
+      added, False if the stack was already full.
     - pop() returns the item removed, or None if the stack was empty.
     """
-
-    _PEEK_INDEX: int = None  # replace None with the correct index
 
     def push(self, item: T) -> bool:
         pass
@@ -157,15 +182,13 @@ class Queue(BoundedCollection[T]):
     longest.
 
     Contract:
-    - Set _PEEK_INDEX so that peek/dequeue act on the front of the
-      queue -- the opposite end from the one enqueue() adds to.
-    - enqueue(item) returns True if the item was added, False if the
-      queue was already full.
+    - enqueue(item) inserts at index self.size() -- one past the last
+      occupied slot (see _add) -- so the front of the queue stays at
+      self._items[0] until it is dequeued. Returns True if the item
+      was added, False if the queue was already full.
     - dequeue() returns the item removed, or None if the queue was
       empty.
     """
-
-    _PEEK_INDEX: int = None  # replace None with the correct index
 
     def enqueue(self, item: T) -> bool:
         pass

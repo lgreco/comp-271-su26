@@ -72,6 +72,13 @@ The stub file [`stack_queue_assignment.py`](./stack_queue_assignment.py) contain
 
 Every one of these collections is backed by a single Python list, `self._items`, and a fixed `self._capacity` set once at construction and never changed. Do not let `self._items` grow past `self._capacity` -- that is the entire meaning of "fixed capacity" here.
 
+**No list shortcuts for insertion or removal.** `list.insert(index, value)`, `list.pop(index)` (with an index other than none), and `list.remove(value)` all do their own shifting internally, in C, hiding the exact cost this assignment is about. None of those three may appear anywhere in your solution. The only list operations you may use to change the *length* of `self._items` are:
+
+* `self._items.append(item)` -- grow the list by one slot at the end.
+* `self._items.pop()` -- called with **no argument** -- shrink the list by one slot at the end.
+
+Both of those are $\mathcal O(1)$ and involve no shifting on their own. Any actual shifting -- moving existing elements one slot to make room, or one slot to close a gap -- must be a loop you write yourself, reading and writing `self._items[i]` by index.
+
 ---
 
 ## Part 1: `BoundedCollection`
@@ -85,11 +92,18 @@ Implement:
 * `size(self) -> int` -- how many items are currently stored.
 * `__len__(self) -> int` -- same value as `size`, so `len(my_stack)` works.
 * `is_full(self) -> bool` -- `True` once `size()` reaches `self._capacity`.
-* `peek(self) -> T | None` -- the item that would be removed next, without removing it; `None` if empty.
-* `_add(self, item: T) -> bool` -- append `item` unless the collection is full; return whether it was added.
-* `_remove(self) -> T | None` -- remove and return the next item to come out; `None` if empty.
+* `peek(self) -> T | None` -- the item at `self._items[0]`, without removing it; `None` if empty.
+* `_add(self, item: T, index: int) -> bool` -- insert `item` at position `index`, unless the collection is already full; return whether it was added.
+* `_remove(self) -> T | None` -- remove and return `self._items[0]`; `None` if empty.
 
-`peek` and `_remove` both need to know *which end* of `self._items` matters, and that is the one thing a stack and a queue disagree about. The stub declares a class attribute, `_PEEK_INDEX`, for exactly this purpose -- read it with `self._PEEK_INDEX` inside `peek` and `_remove` rather than writing `0` or `-1` directly. `BoundedCollection` itself leaves `_PEEK_INDEX` as `None`; `Stack` and `Queue` each set it to the correct list index in Part 2 and Part 3.
+Unlike earlier drafts of this assignment, `peek` and `_remove` do **not** need to know which end of `self._items` a `Stack` and a `Queue` disagree about -- because of how `_add` is used in Part 2 and Part 3, the item due to come out next always ends up at index `0`, for both classes. Hardcode `0` in `peek` and `_remove`.
+
+The disagreement between a stack and a queue lives entirely in `_add`'s `index` argument:
+
+* Inserting at `index == 0` means: first grow the list by one slot (`append`), then shift every existing item one position to the right (working from the back of the list toward `index`, so you never overwrite a value before you have moved it), then write `item` into `self._items[0]`.
+* Inserting at `index == self.size()` (the first open slot, one past the last occupied one) means there is nothing to shift -- `self._items.append(item)` already puts it exactly there.
+
+Write `_add` generally enough to handle both cases (and, if you want the extra practice, any `index` in between) rather than special-casing `index == 0` and `index == self.size()` as two unrelated code paths.
 
 **One return statement per method.** Every method above must have exactly one `return`, at the very end.
 
@@ -99,11 +113,12 @@ Implement:
 
 A stack is last in, first out: whatever was pushed most recently is the first thing to come back out.
 
-* Set the class attribute `_PEEK_INDEX` to the list index of the top of the stack -- the end that a new push lands on.
-* `push(self, item: T) -> bool` -- add `item` to the top of the stack. Return `True` if it was added, `False` if the stack was already full. Do not duplicate `_add`'s logic here -- call it.
-* `pop(self) -> T | None` -- remove and return the item at the top of the stack, or `None` if the stack is empty. Do not duplicate `_remove`'s logic here -- call it.
+* `push(self, item: T) -> bool` -- add `item` to the top of the stack by calling `self._add(item, 0)`. Return `True` if it was added, `False` if the stack was already full. Do not duplicate `_add`'s logic here -- call it.
+* `pop(self) -> T | None` -- remove and return the item at the top of the stack by calling `self._remove()`. Return `None` if the stack is empty. Do not duplicate `_remove`'s logic here -- call it.
 
-If you find yourself writing `self._items.append(...)` or `self._items.pop(...)` directly inside `Stack`, stop -- that logic already exists on `BoundedCollection`. `push` and `pop` should be thin wrappers.
+Because `push` always inserts at index `0`, the most recently pushed item is always at `self._items[0]` -- which is exactly what `peek` and `_remove` already look at. `push` is the only place where a stack does any shifting; `pop` never has to shift, since removing index `0` and closing the gap is `_remove`'s job, and `_remove` uses the same $\mathcal O(1)$ tail-`pop()` trick as `_add` to shrink the list.
+
+If you find yourself writing `self._items.append(...)`, `self._items.insert(...)`, or `self._items.pop(some_index)` directly inside `Stack`, stop -- that logic already exists on `BoundedCollection`. `push` and `pop` should be thin wrappers.
 
 ---
 
@@ -111,11 +126,12 @@ If you find yourself writing `self._items.append(...)` or `self._items.pop(...)`
 
 A queue is first in, first out: whatever was enqueued longest ago is the first thing to come back out.
 
-* Set the class attribute `_PEEK_INDEX` to the list index of the front of the queue -- the opposite end from the one a new item is enqueued onto.
-* `enqueue(self, item: T) -> bool` -- add `item` to the back of the queue. Return `True` if it was added, `False` if the queue was already full. Call `_add` -- do not duplicate it.
-* `dequeue(self) -> T | None` -- remove and return the item at the front of the queue, or `None` if the queue is empty. Call `_remove` -- do not duplicate it.
+* `enqueue(self, item: T) -> bool` -- add `item` to the back of the queue by calling `self._add(item, self.size())`. Return `True` if it was added, `False` if the queue was already full. Call `_add` -- do not duplicate it.
+* `dequeue(self) -> T | None` -- remove and return the item at the front of the queue by calling `self._remove()`. Return `None` if the queue is empty. Call `_remove` -- do not duplicate it.
 
-Notice that `enqueue` and `push` end up calling the exact same `_add` -- the only thing that ever distinguished a stack from a queue is which end `_PEEK_INDEX` points to.
+Because `enqueue` always inserts one past the last occupied slot, the item that has been waiting longest stays at `self._items[0]` until it is dequeued -- again, exactly what `peek` and `_remove` look at. `enqueue` never has to shift anything; `dequeue`, via `_remove`, does the shifting that closes the gap left at the front.
+
+Notice that `enqueue` and `push` end up calling the exact same `_add` -- the only thing that ever distinguished a stack from a queue was the `index` passed in: `0` for a stack, `self.size()` for a queue. `pop` and `dequeue` call the exact same `_remove`, with no argument at all, because after `Stack.push` and `Queue.enqueue` are wired up this way, the next item to come out is always at index `0` no matter which one you built.
 
 ---
 
