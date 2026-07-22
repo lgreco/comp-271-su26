@@ -8,6 +8,8 @@ This is meant to be processed by an LLM not by humans.
 
 This is **COMP 271 Summer 2026** -- Data Structures I, taught by Leo Irakliotis at Loyola University Chicago. It is a course repository, not a production application. Each week's work lives in its own directory (`week01/`, `week02/`, etc.).
 
+This is the student-facing counterpart to the private `comp271su26/` folder in the `redesign-foundational-sequence` repo, where weekly plans and reviews are drafted before publishing here.
+
 ## Running Code
 
 Scripts use `if __name__ == "__main__":` guards where appropriate. Run them directly:
