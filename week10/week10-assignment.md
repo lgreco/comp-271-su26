@@ -14,13 +14,14 @@ We then reasoned through the two core operations. Adding an item is straightforw
 
 * [The Python Tutorial -- Classes](https://docs.python.org/3/tutorial/classes.html) --
   background on instance methods and `self`, the mechanism behind the
-  `FileQueue` class this session's design became.
+  `FileQueue` class this session's design became, implemented in
+  [`queue_as_file.py`](./queue_as_file.py).
 
 ---
 
 ### July 22 -- Magic Values, Constants, and Finishing enqueue/dequeue
 
-We continued building the file-backed queue, starting from a constructor with a hard-coded file name and capacity -- magic values, literals with no explanation for where they came from. We replaced them with named constants (`DEFAULT_FILE_NAME`, `DEFAULT_CAPACITY`), letting the constructor accept a user-specified file name and capacity while falling back to those defaults when neither is given. We noted that by convention, uppercase names signal "this is a constant," but Python cannot actually stop a program from reassigning one -- that enforcement relies on programmer discipline, not the language. To make the point concrete, we used JShell and a compiled Java program to show that Java's `final` modifier truly blocks reassignment at compile time; Python has no equivalent, so we "rely on the we are all adults here principle."
+We continued building the file-backed queue, starting from a constructor with a hard-coded file name and capacity -- magic values, literals with no explanation for where they came from. We replaced them with named constants (`DEFAULT_FILE_NAME`, `DEFAULT_CAPACITY`), letting the constructor accept a user-specified file name and capacity while falling back to those defaults when neither is given. We noted that by convention, uppercase names signal "this is a constant," but Python cannot actually stop a program from reassigning one -- that enforcement relies on programmer discipline, not the language. To make the point concrete, we used JShell and a compiled Java program, [`Final.java`](./Final.java), to show that Java's `final` modifier truly blocks reassignment at compile time; Python has no equivalent, so we "rely on the we are all adults here principle."
 
 With the file created in the constructor, we wrote `is_full()` by comparing size to capacity, then `enqueue()`, which opens the file in append mode and writes the payload followed by a newline, incrementing size on success -- simplified to return directly from the fullness check rather than through an intermediate variable. `dequeue()` was more involved: read the first line as the front of the queue, copy every remaining line into a temporary file, close both files, and swap the temporary file in as the new queue file, since a plain text file has no way to remove just its first line directly. We closed by discussing where to draw the line on magic values: mode strings like `"w"`, `"r"`, and `"a"` are technically string literals too, but since they are documented in Python's own reference, treating them as an acceptable exception is a matter of style rather than a hard rule.
 
@@ -34,7 +35,7 @@ With the file created in the constructor, we wrote `is_full()` by comparing size
 
 ## Overview
 
-This week's queue design -- read the front line, copy the rest to a temp file, swap the temp file in -- is the same idea a *file-backed stack* [`stackq.py`](./stackq.py) already uses, except a stack has to find its top at the *other* end of the file, since last in, first out means the newest item is whichever line was written most recently.
+This week's queue design in [`queue_as_file.py`](./queue_as_file.py) -- read the front line, copy the rest to a temp file, swap the temp file in -- is the same idea a *file-backed stack* [`stack_as_file.py`](./stack_as_file.py) already uses, except a stack has to find its top at the *other* end of the file, since last in, first out means the newest item is whichever line was written most recently.
 
 Two tasks this week, both continuing the "no lists, no arrays, the file itself is the container" theme from class.
 
@@ -42,7 +43,7 @@ Two tasks this week, both continuing the "no lists, no arrays, the file itself i
 
 ## Part 1: A Front-Loaded Stack
 
-[`stackq.py`](./stackq.py) currently implements `FileStack` with the top of the stack living at the file's *last* line: `push()` appends, and `pop()` has to read one line ahead of the line it is about to commit, because a sequential reader has no way to know a line is last until it tries to read the next one and finds nothing there. `peek()` pays the same cost, scanning to the end for the same reason.
+[`stack_as_file.py`](./stack_as_file.py) currently implements `FileStack` with the top of the stack living at the file's *last* line: `push()` appends, and `pop()` has to read one line ahead of the line it is about to commit, because a sequential reader has no way to know a line is last until it tries to read the next one and finds nothing there. `peek()` pays the same cost, scanning to the end for the same reason.
 
 Your job is to flip which end of the file holds the top of the stack: rewrite `push()`, `pop()`, and `peek()` so the top of the stack is the file's *first* line instead.
 
@@ -60,9 +61,9 @@ Implement:
 * `peek()` returns the exact same value `pop()` would remove, without removing it.
 * `size()`, `is_empty()`, `is_full()`, `__bool__()`, and `__len__()` are unchanged -- they only count lines, and the stack has exactly as many lines no matter which end holds the top.
 
-**Notice which half got harder and which got easier.** A file can only ever be written to at its current end -- there is no way to insert at the front of a file directly. Getting `item` to the front on `push()` means building a new file that starts with `item` and then copying every line already on the stack after it, one at a time -- the same "build a new file, then swap the two filenames" idiom `pop()` already uses in the current version, just run for a different reason. `pop()`, meanwhile, becomes the *easier* of the two: reading and discarding the first line, then copying everything that remains, is exactly the shape of `FileQueue.dequeue()` from class. The old version's "read one line ahead" trick, needed because the last line only reveals itself once `readline()` comes back empty, is not needed by either method anymore -- but it has to go *somewhere*, and it lands squarely in `push()` instead.
+**Notice which half got harder and which got easier.** A file can only ever be written to at its current end -- there is no way to insert at the front of a file directly. Getting `item` to the front on `push()` means building a new file that starts with `item` and then copying every line already on the stack after it, one at a time -- the same "build a new file, then swap the two filenames" idiom `pop()` already uses in the current version, just run for a different reason. `pop()`, meanwhile, becomes the *easier* of the two: reading and discarding the first line, then copying everything that remains, is exactly the shape of `FileQueue.dequeue()` in [`queue_as_file.py`](./queue_as_file.py) from class. The old version's "read one line ahead" trick, needed because the last line only reveals itself once `readline()` comes back empty, is not needed by either method anymore -- but it has to go *somewhere*, and it lands squarely in `push()` instead.
 
-**Same public behavior, different mechanism.** This rewrite changes nothing about what `FileStack` does from the outside -- it is still last in, first out. `main()` in [`stackq.py`](./stackq.py) is untouched, and every expected value in its comments still holds. If your rewritten stack produces a single different value there, the rewrite broke the stack's contract, not just its internals.
+**Same public behavior, different mechanism.** This rewrite changes nothing about what `FileStack` does from the outside -- it is still last in, first out. `main()` in [`stack_as_file.py`](./stack_as_file.py) is untouched, and every expected value in its comments still holds. If your rewritten stack produces a single different value there, the rewrite broke the stack's contract, not just its internals.
 
 **One return statement.** Each of the three methods above must have exactly one `return`, at the very end.
 
@@ -149,7 +150,7 @@ Implement:
 
 ## Part 3: Reflection -- Comparing Your Week 9 Work with the Solutions
 
-This part has no new code to write. Open your week 9 submission alongside [`../week09/week09_solutions.py`](../week09/week09_solutions.py) and compare what you wrote with what the solutions contain. Write your answers as comments at the very bottom of [`stackq.py`](./stackq.py), beneath `main()`, so they are included when you submit. A few sentences per question is enough.
+This part has no new code to write. Open your week 9 submission alongside [`../week09/week09_solutions.py`](../week09/week09_solutions.py) and compare what you wrote with what the solutions contain. Write your answers as comments at the very bottom of [`stack_as_file.py`](./stack_as_file.py), beneath `main()`, so they are included when you submit. A few sentences per question is enough.
 
 ```python
 # Part 3 Reflection
@@ -186,10 +187,10 @@ This part has no new code to write. Open your week 9 submission alongside [`../w
 
 ## Verification
 
-**Part 1.** Run [`stackq.py`](./stackq.py) directly:
+**Part 1.** Run [`stack_as_file.py`](./stack_as_file.py) directly:
 
 ```
-python3 stackq.py
+python3 stack_as_file.py
 ```
 
 Every printed value must match the expected comments already in `main()` -- `True`, `False`, `True`, `True`, `True`, `True`, `False`, `C`, `3`, `3`, `C`, `B`, `A`, `None`, `True`, `False` -- unchanged from before your rewrite. Then confirm the mechanism actually changed: after `stack.push("A")`, open `stackq_demo.txt` in a text editor (or `cat` it) and check that `A` is on the *first* line, not the last.
@@ -230,8 +231,17 @@ Then, separately, confirm recovery: run a script that creates a `FileLinkedList`
 
 * [The Python Tutorial -- Classes](https://docs.python.org/3/tutorial/classes.html) --
   covers how instance methods and `self` work, background for both
-  `FileStack` in [`stackq.py`](./stackq.py) and `FileLinkedList` in
+  `FileStack` in [`stack_as_file.py`](./stack_as_file.py) and `FileLinkedList` in
   [`filell.py`](./filell.py).
+* [Introducing Python, Chapter 20 -- Files](https://learning.oreilly.com/library/view/introducing-python-3rd/9781098174392/ch20.html) --
+  reading and writing files, the mechanism underneath every file-backed
+  structure this week, from `FileStack` to `FileLinkedList`.
+* [Computer file (Wikipedia)](https://en.wikipedia.org/wiki/Computer_file) --
+  background on what a file actually is at the operating-system level,
+  useful context for treating a file as a data structure's storage.
+* [Memory & Storage Timeline (Computer History Museum)](https://www.computerhistory.org/timeline/memory-storage/) --
+  historical context for why files on persistent storage behave so
+  differently from in-memory structures like lists and arrays.
 
 ---
 
@@ -242,7 +252,7 @@ Upload your work on **Sakai** under the assignment for **Week 10**.
 Submit only your Python files:
 
 ```
-stackq.py
+stack_as_file.py
 filell.py
 ```
 

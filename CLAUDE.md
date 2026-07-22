@@ -148,6 +148,14 @@ A reference index of all external materials cited in this course. Access to O'Re
 | Chapter 11 | Objects and classes | week02-review.md, week03-assignment.md intro, Part 2 |
 | Chapter 11 -- Inheritance | https://learning.oreilly.com/library/view/introducing-python-3rd/9781098174392/ch11.html#c11_h_inheritance | week08-assignment.md |
 | Chapter 12 | Modules and packages | week03-assignment.md intro, Part 1 |
+| Chapter 20 | Files | week10-assignment.md Further reading |
+
+### General Reference Resources
+
+| Resource | URL | Referenced in |
+|---|---|---|
+| Computer file (Wikipedia) | https://en.wikipedia.org/wiki/Computer_file | week10-assignment.md Further reading |
+| Memory & Storage Timeline (Computer History Museum) | https://www.computerhistory.org/timeline/memory-storage/ | week10-assignment.md Further reading |
 
 ### Shell and Editor Resources
 
